@@ -38,8 +38,10 @@ class CartManager {
 
         try {
 
+            console.log("id que envio: ",idCart)
             const carts = await this.getCarts();
-            const cartId = carts.find(c=>c.id === idCart)
+            const cartId = carts.find(c=>c.id === +idCart)
+            console.log("lo que retorno:",cartId)
             return cartId;
             
         } catch (error) {
