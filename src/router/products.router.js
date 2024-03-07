@@ -1,13 +1,15 @@
 import {Router} from 'express'
-import {productManager} from '../ProductManager.js'
+import ProductManager from '../ProductManager.js'
 
 const router = Router();
+const productManager = new ProductManager("../Products.json")
+
 
 router.get('/', async(req,res)=>{
     try {
         const products = await productManager.getProducts()
         if (!products.length) {
-            console.log(products)
+            console.log(products.length)
             res.status(200).json({message: 'No existen productos actualmente.'})
         } else {
             res.status(200).json({message: 'Productos encontrados: ',products})

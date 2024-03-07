@@ -5,8 +5,9 @@ import cartsRouter from './router/carts.router.js'
 import viewsRouter  from './router/views.router.js'
 import {Namespace, Server} from 'socket.io'
 import {__dirname} from './utils.js'
-import { productManager } from './ProductManager.js'
+import ProductManager from './ProductManager.js'
 
+const productManager = new ProductManager("../Products.json")
 
 const app = express();
 

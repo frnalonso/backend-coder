@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 
-class CartManager {
+export default class CartManager {
     constructor(path) {
         this.path = path
     }
@@ -116,4 +116,4 @@ class CartManager {
 
 }
 
-export const cartManager = new CartManager('Carts.json');
+//export const cartManager = new CartManager('Carts.json');

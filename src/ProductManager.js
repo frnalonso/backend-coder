@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-class ProductManager {
+export default class ProductManager {
 
     constructor(path) {
         this.path = path;
@@ -113,52 +113,5 @@ class ProductManager {
 }
 
 
-export const productManager = new ProductManager('Products.json');
+//export const productManager = new ProductManager('Products.json');
 
-const producto = {
-
-    title: 'producto prueba 2',
-    description: 'Este es un producto prueba',
-    price:200,
-    thumbnail:'Sin imagen',
-    code:'abc129',
-    stock:25
-    }
-    
-    const updateProducto = {
-    title: 'cambio nombre producto',
-    description: 'Este es un producto de update prueba',
-    price: 8800,
-    thumbnail:'Sin imagen',
-    code:'bca321',
-    stock:52
-    }
-
-  
-    
-    async function test() {
-
-        const product1 = new ProductManager('Products.json');
-    
-        const products = await product1.getProducts();
-        console.log(products);
-
-        await product1.addProduct(producto);
-        
-       // const products2 = await product1.getProducts();
-        //console.log(products2); 
-
-        const productById = await product1.getProductById(1);
-        //console.log(productById);
-        //await product1.updateProduct(1,updateProducto);
-        //console.log(productById);
-    
-    
-        //await product1.deleteProduct(1);
-        
-    
-    }
-    
-    //test();
-    
-    
