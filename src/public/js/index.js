@@ -57,31 +57,29 @@ buttonDelete.addEventListener('click',e =>{
     socket.emit('client:deleteproduct',id);
 })
 
-socket.on('server:deleteproduct', (products) => {
-    console.log(products);
-
-    // Actualiza la tabla con los productos actualizados
-
-    table.innerHTML = ''; // Borra la tabla actual
-
-    // Recrea la tabla con los productos actualizados
-    products.forEach((product) => {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.title}</td>
-            <td>${product.description}</td>
-            <td>${product.price}</td>
-            <td>${product.code}</td>
-            <td>${product.stock}</td>
-        `;
-        table.appendChild(newRow);
+socket.on('server:deleteproduct', (deletedProductId) => {
+    // Encuentra la fila correspondiente al producto eliminado por su valor
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(row => {
+        // Encuentra la celda que contiene el ID del producto
+        const idCell = row.querySelector('td:first-child');
+        if (idCell && idCell.textContent.trim() === deletedProductId) {
+            // Si se encuentra la fila, elimínala
+            row.remove();
+        }
     });
 });
 
+    
 
+/*
 socket.on('server:newproduct',data => {
-    console.log(data.title)
+
+
+    console.log(data.id)
+
+    
+
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
         <td>${data.id}</td>
@@ -93,3 +91,28 @@ socket.on('server:newproduct',data => {
     `;
     table.appendChild(newRow);
 })
+*/
+
+socket.on('server:newproduct',(data) => {
+
+    console.log("---------")
+    console.log(data.id)
+    console.log("---------")
+
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>${data._id}</td>
+        <td>${data.title}</td>
+        <td>${data.description}</td>
+        <td>${data.price}</td>
+        <td>${data.code}</td>
+        <td>${data.stock}</td>
+    `;
+    table.appendChild(newRow);
+})
+
+
+
+
+
+

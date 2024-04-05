@@ -1,13 +1,16 @@
 import {Router} from 'express'
-import ProductManager from '../ProductManager.js'
+//import ProductManager from '../dao/FileSystem/ProductManager.js'
+import ProductManagerDB from '../dao/db/productManager.js'
 
+
+const productManager = new ProductManagerDB();
 const router = Router();
-const productManager = new ProductManager("../Products.json")
+//const productManager = new ProductManager("../Products.json")
 
 
 router.get('/', async(req,res)=>{
     try {
-        const products = await productManager.getProducts()
+        const products = await productManager.findAll();
         if (!products.length) {
             console.log(products.length)
             res.status(200).json({message: 'No existen productos actualmente.'})
@@ -22,7 +25,8 @@ router.get('/', async(req,res)=>{
 router.get('/:pid',async(req,res)=>{
     try {
         const {pid} = req.params
-        const product = await productManager.getProductById(+pid);
+        console.log(pid)
+        const product = await productManager.findById(pid)
         if (!product) {
             res.status(400).json({message: 'Productos no encontrado con el id ingresado'})
             console.log("producto no encontrado")
@@ -37,8 +41,8 @@ router.get('/:pid',async(req,res)=>{
 
 router.post('/', async(req,res)=>{
     try {
-        console.log(req.body)
-       const newProduct = await productManager.addProduct(req.body);
+    
+       const newProduct = await productManager.createOne(req.body)
         res.status(200).json({message: 'Producto agregado satisfactoriamente...', product: newProduct })
     } catch (error) {
         res.status(400).json({message:error})
@@ -49,13 +53,13 @@ router.put('/:pid', async(req,res)=>{
     const {pid} = req.params
    
     try {
-        const response = await productManager.updateProduct(+pid,req.body)
+        const response = await productManager.updateOne(+pid,req.body)
 
         if (response === -1) {
             res.status(400).json({message: 'Producto no encontrado con el id ingresado'})
         } else {
             
-            await productManager.updateProduct(+pid);
+            await ProductManagerDB.updatOne(+pid);
             res.status(200).json({message: 'Producto modificado satisfactoriamente...'})
         }
 
@@ -67,7 +71,7 @@ router.put('/:pid', async(req,res)=>{
 router.delete('/:pid',async(req,res)=> {
 const {pid} = req.params
     try {
-        await productManager.deleteProduct(+pid)
+        await productManager.deleteOne(pid)
         res.status(200).json({message: 'Producto eliminado correctamente...'})
     } catch (error) {
         res.status(500).json({message: error})

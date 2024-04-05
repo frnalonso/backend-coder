@@ -34,6 +34,7 @@ export default class ProductManager {
             
             await fs.promises.writeFile(this.path, JSON.stringify(products));
 
+            return obj;
 
 
         } catch (error) {
