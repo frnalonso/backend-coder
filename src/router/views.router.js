@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import ProductManager from '../dao/db/productManager.js'
+import ProductManager from '../dao/services/productManager.js'
 
 
 const router = Router();
@@ -12,13 +12,14 @@ router.get('/index', async(req,res)=>{
     res.render('index',{Products: products} );
 });
 
-
-
-
 router.get('/realtimeproducts',async(req,res)=>{
     const products = await productManager.findAll()
     res.render('realTimeProducts', {Products: products})
 })
+
+router.get('/chat', (req,res) => {
+    res.render('chat')
+});
 
 
 export default router;

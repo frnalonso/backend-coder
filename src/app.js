@@ -5,13 +5,13 @@ import cartsRouter from './router/carts.router.js'
 import viewsRouter  from './router/views.router.js'
 import { Server } from 'socket.io'
 import __dirname from './utils.js'
-import ProductManager from './dao/db/productManager.js'
+import ProductManager from './dao/services/productManager.js'
+import MessageManager from './dao/services/messageManager.js'
 import './dao/db/config.js'
 import path from 'path'
 
-
-
 const productManager = new ProductManager()
+const messageManager = new MessageManager()
 
 const app = express();
 
@@ -37,36 +37,45 @@ const httpServer = app.listen(port,()=>{
    })
 
 
-//websocket - server del lado del servidor
-const socketServer = new Server(httpServer); //haciendo esto ya me deja a mi trabajar todo el tema de socket del lado del servidor
+ //websocket - server del lado del servidor
+const socketServer = new Server(httpServer); // Establece el servidor de WebSocket
 
-
-socketServer.on('connection',(socket)=> {
-
-    let idCliente = socket.id
-    
-    console.log('Cliente conectado',idCliente);
+// Websocket para el Chat
+socketServer.on('connection', (socket) => {
+    console.log('Cliente conectado', socket.id);
 
    
-    socket.on('client:newproduct',async (data)=>{
-     const product =  await productManager.createOne(data)
-       socket.emit('server:newproduct',product)
+    // Función para manejar los mensajes del chat
+    async function messagesHandler() {
+        socket.on("messageSent", async (message) => {
+            await messageManager.createOne(message);
+            emitNewMessages();
+        });
 
-       
-    })
-    
-    socket.on('client:deleteproduct',async(productId)=>{
-     
-     await productManager.deleteOne(productId)
-     //const products = await productManager.findAll()
-     socket.emit('server:deleteproduct',productId)
-     
+        socket.on("getMessages", async () => {
+            emitNewMessages();
+        });
+    }
 
- })
+    // Función para emitir nuevos mensajes a todos los clientes conectados
+    async function emitNewMessages() {
+        const messages = await messageManager.findAll();
+        socketServer.emit("newMessages", messages);
+    }
 
- 
+    // Llama a la función de manejo de mensajes del chat
+    messagesHandler();
 
+    // Función para manejar la creación y eliminación de productos
+    socket.on('client:newproduct', async (data) => {
+        const product = await productManager.createOne(data);
+        socket.emit('server:newproduct', product);
+    });
 
+    socket.on('client:deleteproduct', async (productId) => {
+        await productManager.deleteOne(productId);
+        socket.emit('server:deleteproduct', productId);
+    });
 });
 
 
