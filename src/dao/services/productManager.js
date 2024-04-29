@@ -1,14 +1,44 @@
-import productModel from '../models/product.model.js'
 
+import productModel from '../models/product.model.js'
 
 export default class ProductManagerDB {
 
-    constructor() {
-        console.log('Clase productManager')
-    }
+  
+    async findAll(params){
 
-    async findAll(){
-        const response = await productModel.find().lean();
+        const {
+            limit = 4, // default limit = 10
+            page = 1, // default page = 1
+            sort = null,
+            query = null,
+            category = null,
+            status = null, // disponible
+          } = params;
+      
+          
+          const options = {
+            query: query,
+            page: Number(page),
+            limit: Number(limit),
+            sort: sort ? { price: sort === "asc" ? 1 : -1 }: {},
+            lean: true
+          };
+
+          const filtroConsulta = {}
+
+            if (category) {
+                filtroConsulta.category = { $regex: category, $options: "i" };
+              }
+
+            if (status) {
+                filtroConsulta.status = status === "true"
+              }
+
+              console.log(filtroConsulta)
+          
+
+
+        const response = await productModel.paginate(filtroConsulta,options)
         return response;
     }
 

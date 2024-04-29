@@ -11,6 +11,7 @@ const price = document.getElementById('price');
 const thumbnail = document.getElementById('thumbnail');
 const code = document.getElementById('code');
 const stock = document.getElementById('stock');
+const category = document.getElementById('category');
 const buttonDelete = document.getElementById('delete-product')
 const idProduct = document.getElementById('id-delete')
 
@@ -44,7 +45,8 @@ formProduct.addEventListener('submit',e => {
         price: price.value,
         thumbnail: thumbnail.value,
         code: code.value,
-        stock: stock.value
+        stock: stock.value,
+        category: category.value
     })
 })
 
@@ -95,10 +97,6 @@ socket.on('server:newproduct',data => {
 
 socket.on('server:newproduct',(data) => {
 
-    console.log("---------")
-    console.log(data.id)
-    console.log("---------")
-
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
         <td>${data._id}</td>
@@ -107,6 +105,7 @@ socket.on('server:newproduct',(data) => {
         <td>${data.price}</td>
         <td>${data.code}</td>
         <td>${data.stock}</td>
+        <td>${data.category}</td>
     `;
     table.appendChild(newRow);
 })

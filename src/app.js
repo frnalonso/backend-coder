@@ -31,7 +31,7 @@ app.use('/api/carts', cartsRouter)
 app.use('/api/views',viewsRouter)
 
 
-const port = 8080;
+const port = 8000;
 const httpServer = app.listen(port,()=>{
     console.log("Escuchando puerto",port)
    })

@@ -10,12 +10,14 @@ const router = Router();
 
 router.get('/', async(req,res)=>{
     try {
-        const products = await productManager.findAll();
-        if (!products.length) {
-            console.log(products.length)
-            res.status(200).json({message: 'No existen productos actualmente.'})
-        } else {
-            res.status(200).json({message: 'Productos encontrados: ',products})
+          // Obtener parámetros de consulta
+        
+          const products = await productManager.findAll(req.query);
+          if (!products) {
+              res.status(200).json({message: 'No existen productos actualmente.'})
+            } else {
+                res.status(200).json({message: 'Productos encontrados: ',products})
+               // console.log(page,limit,sort)
         }
     } catch (error) {
         res.status(500).json({message: error})
@@ -41,8 +43,8 @@ router.get('/:pid',async(req,res)=>{
 
 router.post('/', async(req,res)=>{
     try {
-    
-       const newProduct = await productManager.createOne(req.body)
+        const { product } = req.body
+       const newProduct = await productManager.createOne(product)
         res.status(200).json({message: 'Producto agregado satisfactoriamente...', product: newProduct })
     } catch (error) {
         res.status(400).json({message:error})

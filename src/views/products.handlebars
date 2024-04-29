@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Productos</title>
+</head>
+<body>
+    <h2>Tienda de Productos</h2>
+   
+        <div>
+            {{#each Products}}
+            <div>
+                <img src="{{this.thumbnail}}" alt="{{this.title}}">
+                <div>
+                    <h3>{{this.title}}</h3>
+                    <p>Precio: {{this.price}}</p>
+                    <p>Descripción: {{this.description}}</p>
+                    <p>Stock: {{this.stock}}</p>
+            <form action="/api/carts/{{../cartId}}/product/{{this._id}}" method="post">
+                <button type="submit">Agregar al carrito</button>
+            </form>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+<!-- Paginación -->
+<div>
+    {{#if paginationInfo.hasPrevPage}}
+        <a href="{{paginationInfo.hasPrevPage}}">Anterior</a>
+    {{/if}}
+    {{#if paginationInfo.hasNextPage}}
+        <a href="{{paginationInfo.hasNextPage}}">Siguiente</a>
+    {{/if}}
+</div>
+
+   
+</body>
+</html>
