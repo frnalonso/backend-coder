@@ -4,37 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda de Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome {
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logout button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout button:hover {
+            background-color: #c82333;
+        }
+        .logout button:focus {
+            outline: none;
+        }
+        .product {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .product img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Tienda de Productos</h2>
-   
+    <div class="container">
+        <h2>Tienda de Productos</h2>
+        {{#if user}}
+        <div class="welcome">
+            <div>Bienvenido, {{user.first_name}} {{user.last_name}} ({{user.role}})</div>
+            <div class="logout">
+                <form id="logoutForm" method="post">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+        {{/if}}
+
         <div>
             {{#each Products}}
-            <div>
+            <div class="product">
                 <img src="{{this.thumbnail}}" alt="{{this.title}}">
                 <div>
                     <h3>{{this.title}}</h3>
                     <p>Precio: {{this.price}}</p>
                     <p>Descripción: {{this.description}}</p>
                     <p>Stock: {{this.stock}}</p>
-            <form action="/api/carts/{{../cartId}}/product/{{this._id}}" method="post">
-                <button type="submit">Agregar al carrito</button>
-            </form>
+                    <form action="/api/carts/{{../cartId}}/product/{{this._id}}" method="post">
+                        <button type="submit">Agregar al carrito</button>
+                    </form>
                 </div>
             </div>
             {{/each}}
         </div>
 
-<!-- Paginación -->
-<div>
-    {{#if paginationInfo.hasPrevPage}}
-        <a href="{{paginationInfo.hasPrevPage}}">Anterior</a>
-    {{/if}}
-    {{#if paginationInfo.hasNextPage}}
-        <a href="{{paginationInfo.hasNextPage}}">Siguiente</a>
-    {{/if}}
-</div>
-
-   
+        <!-- Paginación -->
+        <div class="pagination">
+            {{#if paginationInfo.hasPrevPage}}
+                <a href="{{paginationInfo.hasPrevPage}}">Anterior</a>
+            {{/if}}
+            {{#if paginationInfo.hasNextPage}}
+                <a href="{{paginationInfo.hasNextPage}}">Siguiente</a>
+            {{/if}}
+        </div>
+    </div>
 </body>
 </html>
+
+<script src="/js/logout.js"></script>

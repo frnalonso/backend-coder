@@ -1,15 +1,16 @@
 import {Router} from 'express'
 import ProductManager from '../dao/services/productManager.js'
 import CartManagerDB from '../dao/services/cartManager.js';
+import { auth } from '../middlewares/auth.js'
 
 
 const router = Router();
 const productManager = new ProductManager()
 const cartManager = new CartManagerDB()
 
-router.get('/products', async (req, res) => {
+router.get('/products', auth , async (req, res) => {
     console.log(req.query);
-    const cartIdPorDefecto = '662d96b78afd621e75cfe513' //Se utiliza un cartIdPorDefecto dado que es la Segunda Pre Entrega. En la próxima será utilizado con la sesión usuario.
+    const cartIdPorDefecto = '662d957cec28377647b1982f' //Se utiliza un cartIdPorDefecto dado que es la Segunda Pre Entrega. En la próxima será utilizado con la sesión usuario.
     const cart = await cartManager.findById(cartIdPorDefecto)
     const cartId = cart._id
     console.log(cartId)
@@ -36,9 +37,9 @@ router.get('/products', async (req, res) => {
 
     console.log(paginationInfo.hasNextPage);
 
-    res.render('products', { Products: products.docs, paginationInfo, cartId });
+    res.render('products', 
+    { Products: products.docs, paginationInfo, cartId, user: req.session.user });
 });
-
 
 
 router.get('/realtimeproducts',async(req,res)=>{
@@ -63,5 +64,15 @@ router.get('/carts/:cid', async(req,res)=>{
     }
 })
 
+router.get('/register',(req,res) =>{
+    res.render('register')
+})
+router.get('/login',(req,res) =>{
+    res.render('login')
+})
+
+router.get('/restore', (req,res) =>{
+    res.render('restore')
+})
 
 export default router;
