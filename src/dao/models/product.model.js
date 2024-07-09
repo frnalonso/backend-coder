@@ -17,11 +17,13 @@ const productSchema = new mongoose.Schema({
         require: true
     },
     category: {
-        type: String,
-        require: true
+        type: mongoose.Schema.Types.ObjectId, // Referencia al modelo Category
+        ref: "category", //referencia al nombre del modelo "category"
+        require: true, //obligatorio tener una categoría asociada
     },
     thumbnail: {
-        type: Buffer
+        type: Buffer,
+        require: false,
     },
     code: {
         type: String,

@@ -1,10 +1,13 @@
 import express from 'express'
 import handlebars from 'express-handlebars'
+import { Server } from 'socket.io'
+import __dirname from './utils.js'
 import productsRouter from './router/products.router.js'
 import cartsRouter from './router/carts.router.js'
 import viewsRouter  from './router/views.router.js'
-import { Server } from 'socket.io'
-import __dirname from './utils.js'
+import sessionRouter from './router/sessions.router.js'
+import usersRouter from './router/users.router.js'
+import categoryRouter from  './router/category.router.js'
 import ProductManager from './dao/services/productManager.js'
 import MessageManager from './dao/services/messageManager.js'
 import './dao/db/config.js'
@@ -13,7 +16,8 @@ import cookieParser from 'cookie-parser'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import mongoose from 'mongoose';
-import sessionRouter from './router/sessions.router.js'
+import passport from 'passport'
+import initilizePassport from './config/passport.config.js'
 
 const productManager = new ProductManager()
 const messageManager = new MessageManager()
@@ -45,7 +49,8 @@ app.engine('handlebars', handlebars.engine());
 app.set('views',__dirname+'/views');
 app.set("view engine", "handlebars");
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieParser())
+
+
 
 //logica de la sesión
 
@@ -59,11 +64,22 @@ app.use(session({
     saveUninitialized: false 
 }))
 
+app.use(cookieParser())
+initilizePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
 //routes
 app.use('/api/products',productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/views',viewsRouter)
-app.use("/api/sessions",sessionRouter)
+app.use("/api/sessions",sessionRouter) //no se utilizará ya que es como /api/users
+app.use("/api/category", categoryRouter)
+app.use("/api/users", usersRouter)
+
+app.get('/api/current', (req,res) => {
+    res.send({status: "sucches", payload: req.user})
+})
 
 
 //middewlare
@@ -76,7 +92,6 @@ app.use(session({
 }));*/
 
 /*
-
 app.use(session({
    /* store: new fileStorage({path:'./session', ttl: 100,retries: 0}),*/
    //store: MongoStore.create({
@@ -158,7 +173,6 @@ app.get('/privado',auth,(req,res)=>{
 
 */
 
-
 /*
 
 COOKIES
@@ -181,7 +195,7 @@ app.get('/deletecookie', (req,res)=>{
 */
 
 
-const port = 3000;
+const port = 8000;
 const httpServer = app.listen(port,()=>{
     console.log("Escuchando puerto",port)
    })

@@ -1,4 +1,3 @@
-
 import productModel from '../models/product.model.js'
 
 export default class ProductManagerDB {
@@ -63,5 +62,16 @@ export default class ProductManagerDB {
         const response = await productModel.deleteOne({_id: id}).lean();
         return response;
     }
+
+      //buscar con categorias incluidas
+  getAllProductsWithCategories = async () => {
+    //lógica a implementar
+    try {
+      const products = await productModel.find().populate("category");
+      return products;
+    } catch (error) {
+      console.log("Error  al obtener todos lo productos");
+    }
+  };
 
 }

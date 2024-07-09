@@ -7,16 +7,32 @@ const productManager = new ProductManagerDB();
 const router = Router();
 //const productManager = new ProductManager("../Products.json")
 
-
+//get Products
 router.get('/', async(req,res)=>{
     try {
           // Obtener parámetros de consulta
         
-          const products = await productManager.findAll(req.query);
+          const products = await productManager.getAll(req.query);
           if (!products) {
               res.status(200).json({message: 'No existen productos actualmente.'})
             } else {
                 res.status(200).json({message: 'Productos encontrados: ',products})
+               // console.log(page,limit,sort)
+        }
+    } catch (error) {
+        res.status(500).json({message: error})
+    }
+})
+
+router.get('/productscategory', async(req,res)=>{
+    try {
+          // Obtener parámetros de consulta
+        
+          const products = await productManager.getAllProductsWithCategories(req.query);
+          if (!products) {
+              res.status(200).json({message: 'No existen productos actualmente.'})
+            } else {
+                res.status(200).json({message: 'Productos con sus categorías: ',products})
                // console.log(page,limit,sort)
         }
     } catch (error) {
@@ -43,8 +59,8 @@ router.get('/:pid',async(req,res)=>{
 
 router.post('/', async(req,res)=>{
     try {
-        const { product } = req.body
-       const newProduct = await productManager.createOne(product)
+        //const { product } = req.body
+       const newProduct = await productManager.createOne(req.body)
         res.status(200).json({message: 'Producto agregado satisfactoriamente...', product: newProduct })
     } catch (error) {
         res.status(400).json({message:error})

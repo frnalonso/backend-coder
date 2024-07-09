@@ -1,14 +1,14 @@
 import {Router} from 'express'
 import ProductManager from '../dao/services/productManager.js'
 import CartManagerDB from '../dao/services/cartManager.js';
-import { auth } from '../middlewares/auth.js'
+import  passport  from 'passport';
 
 
 const router = Router();
 const productManager = new ProductManager()
 const cartManager = new CartManagerDB()
 
-router.get('/products', auth , async (req, res) => {
+router.get('/products', passport.authenticate('jwt', {session:false}) , async (req, res) => {
     console.log(req.query);
     const cartIdPorDefecto = '662d957cec28377647b1982f' //Se utiliza un cartIdPorDefecto dado que es la Segunda Pre Entrega. En la próxima será utilizado con la sesión usuario.
     const cart = await cartManager.findById(cartIdPorDefecto)

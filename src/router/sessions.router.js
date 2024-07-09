@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import userModel from '../dao/models/user.model.js'
 import {createHash, isValidPassword} from '../utils.js'
+import passport from 'passport';
 
 const router = Router();
 
+/* router.post(register)
 router.post("/register", async (req, res) => {
 
     const {first_name,last_name,email,age,password} = req.body
@@ -27,9 +29,21 @@ router.post("/register", async (req, res) => {
   const result =  await userModel.create(user)
   console.log(result)
     res.status(201).send({status: "succes", payload: result })
-});
+}); */
 
 
+router.post('/register', passport.authenticate('register', {failureRedirect:'/failregister'}), async(req,res) =>{
+    res.status(201).send({status: "succes", message: "Usuario registrado"})
+    
+})
+
+router.get('/failregister', async(req,res)=>{
+    console.log("error")
+    res.send({error: "Fallo el router.get /failregister"})
+})
+
+
+/*router.post(login)
 router.post("/login", async (req, res) => {
 
     const {email, password} = req.body 
@@ -55,7 +69,9 @@ router.post("/login", async (req, res) => {
     }
     
     const user = await userModel.findOne({email})
+
     console.log(user)
+
     if(!user) {
         return res
         .status(401)
@@ -90,6 +106,53 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ error: "Error interno del servidor" });
 }
 });
+
+*/
+
+router.post('/login', passport.authenticate('login',{failureRedirect: '/faillogin'}),
+async(req,res) =>{
+
+if (!req.user) return res.status(400).send('error')
+
+req.session.user = {
+    first_name: req.user.first_name,
+    last_name: req.user.last_name,
+    email: req.user.email,
+    age: req.user.age,
+    role: req.user.role
+};
+
+res.status(200).send({status:"success",payload: req.user})
+
+})
+
+router.get('/faillogin', async(req,res)=>{
+    console.log("error")
+    res.send({error: "Faillo el router.get /faillogin"})
+})
+
+
+//Iniciar sesión usando GitHub
+router.get(
+    '/github',
+    passport.authenticate('github',{scope: ["user:email"] }),
+    async (req, res) =>{
+        //podemos enviar una respuesta
+        console.log("Exitoso desde get /github")
+    }
+)
+
+//ruta que nos lleva a github login
+router.get(
+    '/githubcallback',
+    passport.authenticate('github', {failureRedirect: '/login' }),
+    async(req, res) => {
+        req.session.user = req.user;
+
+        res.redirect('/api/views/products') //ruta a ala que redirigiemos luego del inicio de sesión
+    }
+)
+
 
 router.post("/restore", async (req, res) => {
     //validar (si tengo pass vacio o email le mando una rta)
