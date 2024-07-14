@@ -1,7 +1,10 @@
 import productModel from '../models/product.model.js'
 
-export default class ProductManagerDB {
+class ProductService {
 
+  constructor() {
+    console.log("Servicio de Producto")
+  }
   
     async findAll(params){
 
@@ -75,3 +78,5 @@ export default class ProductManagerDB {
   };
 
 }
+
+export default new ProductService;

@@ -1,112 +1,30 @@
 import {Router} from 'express'
-//import CartManager from '../dao/FileSystem/CartManager.js'
-import CartManagerDB from '../dao/services/cartManager.js';
-
+import cartController from '../controllers/cart.controller.js';
 
 const router = Router();
-const cartManager = new CartManagerDB();
-
 
 //Crea un nuevo carrito.
-router.post('/', async(req,res)=> {
-    try {
-        
-        const newCart = await cartManager.createOne()
-        res.status(200).json({message: 'Carrito creado: ',cart: newCart})
-    } catch (error) {
-        res.status(400).json({message:error})
-    }
-})
+router.post('/', cartController.createCart)
 
 //Inserta productos al carrito.
-router.post('/:cid/product/:pid', async(req,res)=> {
-    try {
-        const {pid, cid} = req.params
-
-        const cart = await cartManager.insertProductInCart(cid,pid);
-
-        res.status(200).json({message: 'Producto agregado al carrito...', cart})
-
-    } catch (error) {
-        res.status(400).json({message:error})
-    }
-})
+router.post('/:cid/product/:pid', cartController.insertProductInCart)
 
 //Busca un único carrito según su id.
-router.get('/:cid',async(req,res)=>{
-    try {
-        const {cid} = req.params
-        const cartId = await cartManager.findById(cid)
-        res.status(200).json({message: 'Carrito encontrado: ',cart : cartId})
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.get('/:cid', cartController.getCartById)
 
 //Busca todos los carritos.
-router.get('/',async(req,res)=>{
-    try {
-        const carts = await cartManager.findAll()
-        res.status(200).json({message:"Carritos encontrados: ",cart: carts})
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.get('/', cartController.getCartAll)
 
 //Eliminar del carrito el producto seleccionado
-router.delete('/:cid/product/:pid', async(req,res)=> {
-
-    const {cid, pid} = req.params
-    try {
-        console.log(cid,pid)
-        await cartManager.removeProductCart(cid,pid)
-        res.status(200).json({message:"Producto eliminado del carrito:  "})
-
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.delete('/:cid/product/:pid', cartController.deleteProductCart)
 
 //Actualiza el carrito con un arreglo de productos.
-router.put('/:cid', async(req,res)=> {
-
-    const { cid } =req.params;
-    const products = req.body;
-    console.log(products)
-
-    try {
-        await cartManager.updateCartArrayProducts(cid,products)
-        res.status(200).json({message: "Se actualizo el arreglo de productos del carrito."})
-        
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.put('/:cid', cartController.updateCartArrayProducts)
 
 //Actualizar SOLO la cantidad de ejemplares del producto.
-router.put('/:cid/products/:pid', async(req,res)=>{
-    const {cid, pid} = req.params
-    const {quantity} = req.body
-    console.log(quantity)
-    try {
-        await cartManager.updateQuantityProductInCart(cid,pid,quantity)
-        res.status(200).json({message: "Se actualizo la cantidad correctamente."})
-
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.put('/:cid/products/:pid', cartController.updateQuantityProductInCart)
 
 //Se eliminan todos los productos del carrito.
-router.delete('/:cid',async(req,res)=>{
-    const {cid} = req.params
-    
-    try {
-        await cartManager.deleteAllProductsInCart(cid) 
-        res.status(200).json({message: "Se han eliminado todos los productos del carrito correctamente."})    
-    } catch (error) {
-        res.status(400).json({message: error})
-    }
-})
+router.delete('/:cid', cartController.deleteAllProductsInCart)
 
 export default router;

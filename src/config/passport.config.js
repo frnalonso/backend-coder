@@ -2,6 +2,7 @@
 
 import passport from 'passport';
 import jwt from 'passport-jwt';
+import { entorno } from './config.js' 
 
 //import local from 'passport-local'
 import userModel from '../dao/models/user.model.js'
@@ -13,6 +14,7 @@ import GitHubStrategy from 'passport-github2'
 //const LocalStrategy = local.Strategy
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
+const KeyJWT = entorno.secretJWT
 
 const initilizePassport = () => {
 
@@ -21,7 +23,7 @@ const initilizePassport = () => {
             //lógica
             let token = null
             if (req && req.cookies) {
-                token = req.cookies["KeyFrancisco"]
+                token = req.cookies[KeyJWT]
             }
             return token;
         };
@@ -31,7 +33,7 @@ const initilizePassport = () => {
     passport.use('jwt', new JWTStrategy(
         {
             jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-            secretOrKey: 'KeyFrancisco',
+            secretOrKey: KeyJWT,
         },
         async (jwt_payload, done) => {
             try {

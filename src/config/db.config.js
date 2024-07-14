@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
+import { entorno } from '../config/config.js'
 
-const URI = 'mongodb+srv://falonso:123@coderhouse-ecommerce.u3qivcn.mongodb.net/coderhouse-ecommerce?retryWrites=true&w=majority';
+const URI = entorno.mongoUrl
+
+//const URI = 'mongodb+srv://falonso:123@coderhouse-ecommerce.u3qivcn.mongodb.net/coderhouse-ecommerce?retryWrites=true&w=majority';
 
 mongoose.connect(URI, {
   useNewUrlParser: true,

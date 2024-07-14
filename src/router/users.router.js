@@ -1,109 +1,31 @@
 import { Router } from "express";
-//importaciones
-import UserManager from "../dao/services/userManager.js"
-import AuthManager from "../dao/services/authManager.js";
+import userController from "../controllers/user.controller.js";
 import passport from "passport";
+
 const router = Router();
 
-
-const userManager = new UserManager()
-const authManager = new AuthManager()
-
 // Obtener todos los usuarios
-router.get("/users",passport.authenticate('jwt', {session:false}), async (req, res) => {
-    try {
-      const users = await userManager.getAll();
-      res.status(200).json({ users });
-    } catch (error) {
-      console.error(`Error al cargar los usuarios: ${error}`);
-      res.status(500).json({ error: `Error al recibir los usuarios` });
-    }
-  });
+router.get("/users",passport.authenticate('jwt', {session:false}), userController.getAll);
   
   // Obtener un usuario por su ID
-  router.get("/user/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const user = await userManager.getById(id);
-      if (user) {
-        res.status(200).json({ user });
-      } else {
-        res.status(404).json({ error: `Usuario con id: ${id} no encontrado` });
-      }
-    } catch (error) {
-      console.error(`Error al cargar el usuario: ${error}`);
-      res.status(500).json({ error: `Error al recibir el usuario` });
-    }
-  });
+  router.get("/user/:id", userController.getById);
   
   // Crear un nuevo usuario
-  router.post("/user", async (req, res) => {
-    try {
-      const newUser = req.body;
-      const result = await userManager.createUser(newUser);
-      res.status(201).json({ result });
-    } catch (error) {
-      console.error(`Error al crear el usuario: ${error}`);
-      res.status(500).json({ error: `Error al crear el usuario` });
-    }
-  });
+  router.post("/user", userController.createUser);
   
   // Actualizar un usuario existente
-  router.put("/user/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updatedUser = req.body;
-      const result = await userManager.updateUser(id, updatedUser);
-      if (result) {
-        res.status(200).json({ message: "Usuario actualizado exitosamente" });
-      } else {
-        res.status(404).json({ error: "Usuario no encontrado" });
-      }
-    } catch (error) {
-      console.error(`Error al actualizar el usuario: ${error}`);
-      res.status(500).json({ error: `Error al actualizar el usuario` });
-    }
-  });
+  router.put("/user/:id", userController.updateUser);
   
-  // Eliminar un usuario por su ID
-  router.delete("/user/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const deletedUser = await userManager.deleteUser(id);
-      if (deletedUser) {
-        res.status(200).json({ message: "Usuario eliminado exitosamente" });
-      } else {
-        res.status(404).json({ error: "Usuario no encontrado" });
-      }
-    } catch (error) {
-      console.error(`Error al eliminar el usuario: ${error}`);
-      res.status(500).json({ error: `Error al eliminar el usuario` });
-    }
-  });
+  //Eliminar un usuario por su ID
+  router.delete("/user/:id", userController.updateUser);
   
   //login
-  router.post("/login", async (req, res) => {
-    //lógica a implementar
-    try {
-      const { email, password } = req.body;
-      const user = await authManager.login({ email, password });
-      console.log(user)
-      console.log("token: "+user.token);
-      if (user.token) {
-        res
-          .cookie("KeyFrancisco", user.token, {
-            httpOnly: true,
-          })
-          .status(200)
-          .send({ status: "success", message: user.message });
-      }
-    } catch (error) {
-      res.send({ status: "error", message: error });
-    }
-  });
-  // En tu archivo de rutas
-  router.post("/logout", (req, res) => {
-    //lógica a implementar
-  });
+  router.post("/login", userController.loginUser);
+
+  //Logout del usuario
+  router.post("/logout", userController.logoutUser);
+
+  //Restaurar password de un usuario
+  router.post("/restore", userController.restorePassword);
   
   export default router;

@@ -1,17 +1,16 @@
 import {Router} from 'express'
-import ProductManager from '../dao/services/productManager.js'
-import CartManagerDB from '../dao/services/cartManager.js';
+import productService from '../dao/services/product.service.js'
+import cartService from '../dao/services/cart.service.js';
 import  passport  from 'passport';
 
-
 const router = Router();
-const productManager = new ProductManager()
-const cartManager = new CartManagerDB()
+
+
 
 router.get('/products', passport.authenticate('jwt', {session:false}) , async (req, res) => {
     console.log(req.query);
     const cartIdPorDefecto = '662d957cec28377647b1982f' //Se utiliza un cartIdPorDefecto dado que es la Segunda Pre Entrega. En la próxima será utilizado con la sesión usuario.
-    const cart = await cartManager.findById(cartIdPorDefecto)
+    const cart = await cartService.findById(cartIdPorDefecto)
     const cartId = cart._id
     console.log(cartId)
     const currentPage = req.query.page || 1;
@@ -20,7 +19,7 @@ router.get('/products', passport.authenticate('jwt', {session:false}) , async (r
     const queryParams = new URLSearchParams(req.query);
     queryParams.delete('page'); // Eliminar el parámetro "page" actual
 
-    const products = await productManager.findAll(req.query);
+    const products = await productService.findAll(req.query);
 
     const paginationInfo = {
         hasNextPage: products.hasNextPage
@@ -44,7 +43,7 @@ router.get('/products', passport.authenticate('jwt', {session:false}) , async (r
 
 router.get('/realtimeproducts',async(req,res)=>{
 
-    const products = await productManager.findAll(req.query)
+    const products = await productService.findAll(req.query)
     console.log({Products: products.docs})
     res.render('realTimeProducts', {Products: products.docs})
 })
@@ -57,7 +56,7 @@ router.get('/chat', (req,res) => {
 router.get('/carts/:cid', async(req,res)=>{
     try {
         const {cid} = req.params
-    const cart = await cartManager.findById(cid) 
+    const cart = await cartService.findById(cid) 
     res.render("cart", cart);
     } catch (error) {
         

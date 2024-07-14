@@ -1,6 +1,7 @@
 import express from 'express'
 import handlebars from 'express-handlebars'
 import { Server } from 'socket.io'
+import { entorno } from './config/config.js'
 import __dirname from './utils.js'
 import productsRouter from './router/products.router.js'
 import cartsRouter from './router/carts.router.js'
@@ -8,8 +9,8 @@ import viewsRouter  from './router/views.router.js'
 import sessionRouter from './router/sessions.router.js'
 import usersRouter from './router/users.router.js'
 import categoryRouter from  './router/category.router.js'
-import ProductManager from './dao/services/productManager.js'
-import MessageManager from './dao/services/messageManager.js'
+import productService from './dao/services/product.service.js'
+import MessageManager from './dao/services/message.service.js'
 import './dao/db/config.js'
 import path from 'path'
 import cookieParser from 'cookie-parser'
@@ -19,11 +20,12 @@ import mongoose from 'mongoose';
 import passport from 'passport'
 import initilizePassport from './config/passport.config.js'
 
-const productManager = new ProductManager()
 const messageManager = new MessageManager()
 
 
-const URI = 'mongodb+srv://falonso:123@coderhouse-ecommerce.u3qivcn.mongodb.net/coderhouse-ecommerce?retryWrites=true&w=majority';   //No hay variables de entorno todavia por eso me traigo todo lo de DB.
+//Variables de Entorno
+const URI = entorno.mongoUrl
+const port = entorno.port;
 
 mongoose.connect(URI, {
   useNewUrlParser: true,
@@ -194,8 +196,6 @@ app.get('/deletecookie', (req,res)=>{
 })
 */
 
-
-const port = 8000;
 const httpServer = app.listen(port,()=>{
     console.log("Escuchando puerto",port)
    })
@@ -232,12 +232,12 @@ socketServer.on('connection', (socket) => {
 
     // Función para manejar la creación y eliminación de productos
     socket.on('client:newproduct', async (data) => {
-        const product = await productManager.createOne(data);
+        const product = await productService.createOne(data);
         socket.emit('server:newproduct', product);
     });
 
     socket.on('client:deleteproduct', async (productId) => {
-        await productManager.deleteOne(productId);
+        await productService.deleteOne(productId);
         socket.emit('server:deleteproduct', productId);
     });
 });

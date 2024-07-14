@@ -2,7 +2,11 @@ import  cartModel  from '../models/cart.model.js'
 import productModel from '../models/product.model.js';
 
 
-export default class CartManagerDB {
+class CartService {
+
+    constructor() {
+        console.log("Servicio de Carrito")
+    }
     async findAll() {
         const response = await cartModel.find();
         return response;
@@ -167,3 +171,5 @@ export default class CartManagerDB {
     }
 
 }
+
+export default new CartService();
