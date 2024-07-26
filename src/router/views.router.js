@@ -10,16 +10,21 @@ const router = Router();
 
 router.get('/products', passport.authenticate('jwt', {session:false}) , async (req, res) => {
     
-    const email = req.user.email
-    const user = await userService.findOne({email}); // El usuario autenticado
-    let cartId = user.cart; // Obtén el ID del carrito del usuario
+
+    // Accede a la información de la sesión
+   const userSession = req.session.user.user;
+   console.log(userSession)
+   const user = await userService.getById(userSession._id) // El usuario autenticado
+   //console.log(user)
+   let cartId = user.cart; // Obtén el ID del carrito del usuario
+
     // Si el usuario no tiene un carrito, crea uno nuevo
     if (!cartId) {
         const newCart = await cartService.createOne({ products: [] }); // Crea un carrito vacío
         cartId = newCart._id;
 
         // Actualiza el carrito del usuario en la base de datos
-        await userService.updateUser(user, { cart: cartId });
+        await userService.updateUser(user._id, { cart: cartId });
 
         user.cart = cartId
     }
@@ -48,7 +53,7 @@ router.get('/products', passport.authenticate('jwt', {session:false}) , async (r
     console.log(paginationInfo.hasNextPage);
 
     res.render('products', 
-    { Products: products.docs, paginationInfo,cartId , user: req.session.user });
+    { Products: products.docs, paginationInfo,cartId , user: req.session.user.user  });
 });
 
 

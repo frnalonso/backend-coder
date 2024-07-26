@@ -85,13 +85,17 @@ class UserController  {
         try {
           const { email, password } = req.body;
           const user = await authService.login({ email, password });
-          console.log(user)
           if (user.token) {
-            
+            // Establece la sesión del usuario
+            req.session.token = user.token;
+            req.session.userId = user._id;
+            req.session.user = user;
+            req.session.isAuthenticated = true;
+            //req.session.userRole = user.role
             res
               .cookie(KeyJWT, user.token, { httpOnly: true })
               .status(200)
-              .send({ status: "success", message: user });
+              .send({ status: "success", message: user.message });
           } else {
             res.status(401).send({ status: "error", message: user.message });
           }

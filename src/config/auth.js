@@ -16,7 +16,7 @@ import { isValidPassword, generateToken } from "../utils.js";
       console.log(valid)
       if (!valid) return "Error de auteuticación";
       const token = generateToken(email);
-      return { message: "Autenticacion exitosa", token, userId: user._id};
+      return {status: "succes", message: "Autenticacion exitosa", token, user};
     } catch (error) {
       res.status(500).send({ status: "error", massage: error.message });
     }
