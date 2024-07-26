@@ -1,5 +1,6 @@
 import {Router} from 'express'
 import cartController from '../controllers/cart.controller.js';
+import  passport  from 'passport';
 
 const router = Router();
 
@@ -7,7 +8,7 @@ const router = Router();
 router.post('/', cartController.createCart)
 
 //Inserta productos al carrito.
-router.post('/:cid/product/:pid', cartController.insertProductInCart)
+router.post('/:cid/product/:pid', passport.authenticate('jwt', { session: false }), cartController.insertProductInCart)
 
 //Busca un único carrito según su id.
 router.get('/:cid', cartController.getCartById)

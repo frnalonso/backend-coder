@@ -1,82 +1,52 @@
-import productModel from '../models/product.model.js'
+import productRepository from '../repositories/product.repository.js'
 
 class ProductService {
 
-  constructor() {
-    console.log("Servicio de Producto")
-  }
-  
-    async findAll(params){
-
-        const {
-            limit = 4, // default limit = 10
-            page = 1, // default page = 1
-            sort = null,
-            query = null,
-            category = null,
-            status = null, // disponible
-          } = params;
-      
-          
-          const options = {
-            query: query,
-            page: Number(page),
-            limit: Number(limit),
-            sort: sort ? { price: sort === "asc" ? 1 : -1 }: {},
-            lean: true
-          };
-
-          const filtroConsulta = {}
-
-            if (category) {
-                filtroConsulta.category = { $regex: category, $options: "i" };
-              }
-
-            if (status) {
-                filtroConsulta.status = status === "true"
-              }
-
-              console.log(filtroConsulta)
-          
-
-
-        const response = await productModel.paginate(filtroConsulta,options)
+    constructor() {
+        console.log("Servicio de Producto")
+    }
+    //Obtengo productos
+    async findAll(params) {
+        const response = await productRepository.findAll(params)
         return response;
     }
 
     async findById(id) {
-        const response = await productModel.findById(id);
+        const response = await productRepository.findById(id);
         return response;
     }
     async createOne(obj) {
-        //Falta agregar metodo para que restringa en el caso que quiera agregar un objeto con el mismo codigo.
-        const response = await productModel.create(obj);
-        return response;
+        // Validación de negocio, por ejemplo, verificar si ya existe un producto con el mismo código.
+        //const existingProduct = await productRepository.findByCode(obj.code);
+        //if (existingProduct) {
+           // throw new Error('Producto con el mismo código ya existe');
+        //}
+        return await productRepository.createOne(obj);
     }
 
-    async updateOne(id,obj) {
-        //Falta probar este metodo
-        const response = await productModel.findByIdAndUpdate({_id: id},{$set: obj}).lean();
-        return response;
+    async updateOne(id, obj) {
+        const existingProduct = await productRepository.findById(id);
+        if (!existingProduct) {
+            throw new Error('Producto no encontrado');
+        }
+        return await productRepository.updateOne(id, obj);
     }
 
     async deleteOne(id) {
-        //Falta agregar metodo que restringa en el caso que se envia un id y no exista.
-        const response = await productModel.deleteOne({_id: id}).lean();
-        return response;
+        const existingProduct = await productRepository.findById(id);
+        if (!existingProduct) {
+            throw new Error('Producto no encontrado');
+        }
+        return await productRepository.deleteOne(id);
     }
 
-      //buscar con categorias incluidas
-  getAllProductsWithCategories = async () => {
-    //lógica a implementar
-    try {
-      const products = await productModel.find().populate("category");
-      return products;
-    } catch (error) {
-      console.log("Error  al obtener todos lo productos");
-    }
-  };
+    //buscar con categorias incluidas
+    getAllProductsWithCategories = async () => {
+        //lógica a implementar
+        const products = await productRepository.getAllProductsWithCategories()
+        return products;
+    };
 
-}
+};
 
 export default new ProductService;

@@ -1,35 +1,34 @@
-import Category from "../models/category.model.js";
+import categoryRepository from "../repositories/category.repository.js"
 
-export default class CategoryManager {
+ class CategoryService {
   constructor() {
-    console.log("Constructor CategoryManager");
+    console.log("Constructor CategoryService");
   }
 
   getAll = async () => {
-    const result = await Category.find();
+    const result = await categoryRepository.getAll();
     return result;
   };
 
   getById = async (id) => {
-    const result = await Category.findById(id);
+    const result = await categoryRepository.getById(id);
     return result;
   };
 
   createCategory = async (category) => {
-    const result = await Category.create(category);
+    const result = await categoryRepository.createCategory(category)
     return result;
   };
 
   updateCategory = async (id, categoryData) => {
-    const result = await Category.updateOne(
-      { _id: id },
-      { $set: categoryData }
-    );
+    const result = await categoryRepository.updateCategory(id, categoryData)
     return result;
   };
 
   deleteCategory = async (id) => {
-    const result = await Category.deleteOne({ _id: id });
+    const result = await categoryRepository.deleteCategory(id)
     return result;
   };
 }
+
+export default new CategoryService;

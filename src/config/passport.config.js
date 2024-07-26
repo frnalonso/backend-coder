@@ -25,7 +25,9 @@ const initilizePassport = () => {
             if (req && req.cookies) {
                 token = req.cookies[KeyJWT]
             }
+            console.log("aaa+"+token)
             return token;
+
         };
     
 
@@ -38,6 +40,7 @@ const initilizePassport = () => {
         async (jwt_payload, done) => {
             try {
                 return done(null, jwt_payload)
+
             } catch (error) {
                 return done(error)
             }

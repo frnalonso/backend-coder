@@ -1,6 +1,7 @@
 import {Router} from 'express'
 import productService from '../dao/services/product.service.js'
 import cartService from '../dao/services/cart.service.js';
+import userService from '../dao/services/user.service.js';
 import  passport  from 'passport';
 
 const router = Router();
@@ -8,11 +9,21 @@ const router = Router();
 
 
 router.get('/products', passport.authenticate('jwt', {session:false}) , async (req, res) => {
-    console.log(req.query);
-    const cartIdPorDefecto = '662d957cec28377647b1982f' //Se utiliza un cartIdPorDefecto dado que es la Segunda Pre Entrega. En la próxima será utilizado con la sesión usuario.
-    const cart = await cartService.findById(cartIdPorDefecto)
-    const cartId = cart._id
-    console.log(cartId)
+    
+    const email = req.user.email
+    const user = await userService.findOne({email}); // El usuario autenticado
+    let cartId = user.cart; // Obtén el ID del carrito del usuario
+    // Si el usuario no tiene un carrito, crea uno nuevo
+    if (!cartId) {
+        const newCart = await cartService.createOne({ products: [] }); // Crea un carrito vacío
+        cartId = newCart._id;
+
+        // Actualiza el carrito del usuario en la base de datos
+        await userService.updateUser(user, { cart: cartId });
+
+        user.cart = cartId
+    }
+ 
     const currentPage = req.query.page || 1;
 
     
@@ -37,7 +48,7 @@ router.get('/products', passport.authenticate('jwt', {session:false}) , async (r
     console.log(paginationInfo.hasNextPage);
 
     res.render('products', 
-    { Products: products.docs, paginationInfo, cartId, user: req.session.user });
+    { Products: products.docs, paginationInfo,cartId , user: req.session.user });
 });
 
 

@@ -20,8 +20,11 @@ class CartController {
     //Inserta productos al carrito.
     async insertProductInCart (req, res) {
         try {
-            const { pid, cid } = req.params
-            const cart = await cartService.insertProductInCart(cid, pid);
+            const user = req.user._id; // Obtener el usuario autenticado
+            const { cid } = req.params; // ID del carrito desde la ruta
+            const { pid } = req.params; // ID del producto desde la ruta
+            console.log(user)
+            const cart = await cartService.insertProductInCart(cid, pid, user);
             res.status(200).json({ message: 'Producto agregado al carrito...', cart })
 
         } catch (error) {

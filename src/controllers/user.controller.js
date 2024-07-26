@@ -1,18 +1,15 @@
 import { Router } from "express";
 import { entorno } from '../config/config.js'
-import UserService from "../dao/services/user.service.js"
-import AuthService from "../dao/services/auth.service.js";
-import passport from "passport";
+import userService from '../dao/services/user.service.js'
+import authService from '../config/auth.js'
 
 const router = Router();
-const userService = new UserService()
-const authService = new AuthService()
 const KeyJWT = entorno.secretJWT
 
-const userController = {
+class UserController  {
 
     // Obtener todos los usuarios
-    getAll: async (req, res) => {
+     async getAll (req, res) {
         try {
             const users = await userService.getAll();
             res.status(200).json({ users });
@@ -20,10 +17,10 @@ const userController = {
             console.error(`Error al cargar los usuarios: ${error}`);
             res.status(500).json({ error: `Error al recibir los usuarios` });
         }
-    },
+    };
 
     // Obtener un usuario por su ID
-    getById: async (req, res) => {
+    async getById (req, res)  {
         try {
             const { id } = req.params;
             const user = await userService.getById(id);
@@ -36,10 +33,10 @@ const userController = {
             console.error(`Error al cargar el usuario: ${error}`);
             res.status(500).json({ error: `Error al recibir el usuario` });
         }
-    },
+    };
 
     //Crear un nuevo usuario
-    createUser: async (req, res) => {
+    async createUser (req, res) {
         try {
             const newUser = req.body;
             const result = await userService.createUser(newUser);
@@ -48,10 +45,10 @@ const userController = {
             console.error(`Error al crear el usuario: ${error}`);
             res.status(500).json({ error: `Error al crear el usuario` });
         }
-    },
+    };
 
     //Actualizar un usuario existente
-    updateUser: async (req, res) => {
+    async updateUser (req, res) {
         try {
             const { id } = req.params;
             const updatedUser = req.body;
@@ -65,10 +62,10 @@ const userController = {
             console.error(`Error al actualizar el usuario: ${error}`);
             res.status(500).json({ error: `Error al actualizar el usuario` });
         }
-    },
+    };
 
     //Eliminar un usuario por su ID
-    deleteUser: async (req, res) => {
+    async deleteUser (req, res) {
         try {
             const { id } = req.params;
             const deletedUser = await userService.deleteUser(id);
@@ -81,36 +78,36 @@ const userController = {
             console.error(`Error al eliminar el usuario: ${error}`);
             res.status(500).json({ error: `Error al eliminar el usuario` });
         }
-    },
+    };
 
     //login
-    loginUser: async (req, res) => {
-        //lógica a implementar
+    async loginUser (req, res) {
         try {
-            const { email, password } = req.body;
-            const user = await authService.login({ email, password });
-            console.log(user)
-            console.log("token: " + user.token);
-            if (user.token) {
-                res
-                    .cookie(KeyJWT, user.token, {
-                        httpOnly: true,
-                    })
-                    .status(200)
-                    .send({ status: "success", message: user.message });
-            }
+          const { email, password } = req.body;
+          const user = await authService.login({ email, password });
+          console.log(user)
+          if (user.token) {
+            
+            res
+              .cookie(KeyJWT, user.token, { httpOnly: true })
+              .status(200)
+              .send({ status: "success", message: user });
+          } else {
+            res.status(401).send({ status: "error", message: user.message });
+          }
         } catch (error) {
-            res.send({ status: "error", message: error });
+        console.log(error)
+          res.status(500).send({ status: "error", message: error.message });
         }
-    },
+      };
 
     //Logout del usuario
-    logoutUser: async (req, res) => {
+    async logoutUser(req, res)  {
         //lógica a implementar
-    },
+    };
 
     //Restaurar password
-    restorePassword: async (req, res) => {
+    async restorePassword (req, res) {
         //validar (si tengo pass vacio o email le mando una rta)
         const {email, password} = req.body
         const user = await userService.findOne({email})//revisar metodo findOne
@@ -124,8 +121,8 @@ const userController = {
         await userService.updateOne({_id: user._id},{ $set: { password: newPass } }) //revisar metodo updateOne
     
         res.status(201).send({status: "succes", message:"Password actualizado."})
-    },
+    };
 
 };
 
-export default userController;
+export default new UserController;
