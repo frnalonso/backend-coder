@@ -38,6 +38,28 @@
         .button-group button {
             margin-right: 10px;
         }
+        .purchase-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .purchase-button:hover {
+            background-color: #45a049;
+        }
+        .quantity-button {
+            background-color: #008CBA;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quantity-button:hover {
+            background-color: #007B9E;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +67,7 @@
         <h1 class="title">¡Tu Carrito de Compras!</h1>
 
         {{#if products.length}}
-
+        
         {{#each products}}
         <div class="product"> 
             <h2>{{this.product.title}}</h2>
@@ -55,9 +77,25 @@
             <div class="subtotal">
                 <p>Subtotal: ${{this.subtotal}}</p>    
             </div>
+            <div class="button-group">
+                <form action="/api/carts/{{@root._id}}/products/{{this.product._id}}/increment" method="POST">
+                    <button type="submit" class="quantity-button">+</button>
+                </form>
+                <form action="/api/carts/{{@root._id}}/products/{{this.product._id}}/decrement" method="POST">
+                    <button type="submit" class="quantity-button">-</button>
+                </form>
+            </div>
         </div>
         {{/each}}
         <br><br>
+
+        <!-- Botón para realizar la compra del carrito -->
+        <div class="button-group">
+            <form action="/api/carts/{{@root._id}}/purchase" method="POST">
+                <button type="submit" class="purchase-button">Realizar Compra</button>
+            </form>
+        </div>
+        
         {{else}}
             <p>No hay productos en el carrito</p>
         {{/if}}
@@ -68,3 +106,5 @@
     </div>
 </body>
 </html>
+
+<script src="/js/purchase.js"></script>

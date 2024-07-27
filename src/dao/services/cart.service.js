@@ -1,5 +1,7 @@
 import cartRepository from '../repositories/cart.repository.js';
-import productModel from '../models/product.model.js';
+import productModel from '../models/product.model.js'; //arreglar y corregir no usar model aca
+import productRepository from '../repositories/product.repository.js';
+import ticketRepository from '../repositories/ticket.repository.js';
 
 
 class CartService {
@@ -16,6 +18,11 @@ class CartService {
         const response = await cartRepository.findById(id)
         return response;
     };
+
+    async findByIdWithProducts(id) {
+        const response = await cartRepository.findByIdWithProducts(id);
+        return response;
+    }
     async createOne() {
         const response = await cartRepository.createOne({});
         return response;
@@ -112,7 +119,7 @@ class CartService {
 
     async deleteAllProductsInCart(cid) {
         try {
-            const cart = await cartModel.findById(cid);
+            const cart = await cartRepository.findById(cid);
             if (!cart) {
                 throw new Error("El carrito no existe.");
             }
@@ -122,6 +129,51 @@ class CartService {
             throw error;
         }
     }
+
+    async purchaseCart(cid,userEmail) {
+            let totalAmount = 0;
+            const purchasedProducts = [];
+
+            const cart = await cartRepository.findById(cid)
+    
+            if (!cart) {
+                throw new Error( 'Carrito no encontrado' );
+            }
+
+    
+            for (const item of cart.products) {
+                console.log(item)
+                const product = await productRepository.findById(item.product._id);
+    
+                if (product.stock >= item.quantity) {
+                    product.stock -= item.quantity;
+                    await product.save();
+    
+                    totalAmount += product.price * item.quantity;
+                    purchasedProducts.push(item);
+                }
+            } 
+    
+
+            if (purchasedProducts.length === 0) {
+                throw new Error( 'No hay productos con stock suficiente para completar la compra');
+            }
+
+                    // Crear el ticket
+        const ticketData = {
+            code: `TICKET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            amount: totalAmount,
+            purchaser: userEmail
+        };
+    
+            const newTicket = await ticketRepository.createOne(ticketData);
+    
+            await newTicket.save();
+    
+            // Vaciar el carrito
+            await this.deleteAllProductsInCart(cid);
+
+    };
 
 }
 

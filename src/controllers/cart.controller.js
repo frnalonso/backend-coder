@@ -43,6 +43,17 @@ class CartController {
             res.status(400).json({ message: error })
         }
     }
+    async getCartByIdWithProducts (req, res) {
+        try {
+            const { cid } = req.params
+            console.log(cid)
+            const cartId = await cartService.findByIdWithProducts(cid)
+            console.log("ACAAAAAAAAAAA:"+cartId)
+            res.status(200).json({ message: 'Carrito encontrado: ', cart: cartId })
+        } catch (error) {
+            res.status(400).json({ message: error })
+        }
+    }
 
     //Busca todos los carritos.
     async getCartAll (req, res) {
@@ -103,7 +114,20 @@ class CartController {
         } catch (error) {
             res.status(400).json({ message: error })
         }
-    }
+    };
+
+    async purchaseCart (req, res) {
+        const { cid } = req.params;
+        console.log(req.user)
+        const userEmail = req.user.email; // Usuario autenticado
+        try {
+            const ticket = await cartService.purchaseCart(cid,userEmail)
+            res.status(200).json({ message: 'Compra realizada con éxito', ticket: ticket });
+        } catch (error) {
+            console.error('Error al finalizar la compra:', error);
+            res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    };
 
 };
 

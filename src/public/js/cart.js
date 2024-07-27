@@ -1,3 +1,10 @@
+const token = localStorage.getItem('token');
+const userId = localStorage.getItem('userId');
+console.log(localStorage)
+console.log("hola")
+console.log(userId)
+console.log(token)
+
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('.add-to-cart-form');
     forms.forEach(form => {

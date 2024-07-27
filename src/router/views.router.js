@@ -72,7 +72,7 @@ router.get('/chat', (req,res) => {
 router.get('/carts/:cid', async(req,res)=>{
     try {
         const {cid} = req.params
-    const cart = await cartService.findById(cid) 
+    const cart = await cartService.findByIdWithProducts(cid);
     res.render("cart", cart);
     } catch (error) {
         

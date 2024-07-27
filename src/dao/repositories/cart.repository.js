@@ -14,24 +14,37 @@ class CartRepository {
     async findById(id) {
 
         try {
-            const response = await cartModel.findById(id).populate({path:'products.product',model:'Product'}).lean()
+            const response = await cartModel.findById(id);
            
             return response;
         } catch (error) {
             console.log(error)
         }
 
+    };
+
+    async findByIdWithProducts(id) {
+        try {
+            const response = await cartModel.findById(id).populate({path:'products.product',model:'Product'}).lean();
+            return response;
+        } catch (error) {
+            console.log(error)
+        }
+
     }
+
+
+
     async createOne() {
 
         const response = await cartModel.create({});
         return response;
-    }
+    };
 
     async deleteOne() {
         const response = await cartModel.findByIdAndDelete({ id });
         return response;
-    }
+    };
 
     async removeProductCart (cid, pid) {
         // Buscar el carrito por su ID
@@ -58,7 +71,7 @@ class CartRepository {
             return console.log(error)
         }
     
-    }
+    };
 
     async updateCartArrayProducts (idCart, ArrayProducts) {
         try {
@@ -100,7 +113,7 @@ class CartRepository {
                 console.log("Error al actualizar el carrito: ",error)
                 throw error;
             }
-    }
+    };
 
     async updateQuantityProductInCart(idCart, idProduct, quantity) {
         try {
@@ -129,7 +142,7 @@ class CartRepository {
             console.log("Error al actualizar la cantidad ",error)
             throw error;
         }
-    }
+    };
     
     async insertProductInCart(cid, idProduct, userId) {
 
@@ -163,7 +176,7 @@ class CartRepository {
             console.log(error)
             throw error;
         }
-    }
+    };
 
     async deleteAllProductsInCart(cid) {
         try {
@@ -176,7 +189,9 @@ class CartRepository {
         } catch (error) {
             throw error;
         }
-    }
+    };
+
+
 
 
 };

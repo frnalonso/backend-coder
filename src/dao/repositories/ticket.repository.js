@@ -30,6 +30,8 @@ class TicketRepository {
         const result = await Ticket.deleteOne({ _id: id });
         return result;
       };
+
+
 }
 
 export default new TicketRepository;

@@ -10,8 +10,8 @@ router.post('/', cartController.createCart)
 //Inserta productos al carrito.
 router.post('/:cid/product/:pid', passport.authenticate('jwt', { session: false }), cartController.insertProductInCart)
 
-//Busca un único carrito según su id.
-router.get('/:cid', cartController.getCartById)
+//Busca un único carrito según su id devolviendo también sus productos incluídos.
+router.get('/:cid', cartController.getCartByIdWithProducts)
 
 //Busca todos los carritos.
 router.get('/', cartController.getCartAll)
@@ -28,4 +28,6 @@ router.put('/:cid/products/:pid', cartController.updateQuantityProductInCart)
 //Se eliminan todos los productos del carrito.
 router.delete('/:cid', cartController.deleteAllProductsInCart)
 
+// Ruta para finalizar la compra de un carrito
+router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), cartController.purchaseCart);
 export default router;
