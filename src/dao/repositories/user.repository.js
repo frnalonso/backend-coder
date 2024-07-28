@@ -74,6 +74,11 @@ class UserRepository {
     console.log(user)
     return user;
   }
+
+  current = async(userData) => {
+    const user = new UserDTO(userData)
+    return user;
+  };
 };
 
 export default new UserRepository;

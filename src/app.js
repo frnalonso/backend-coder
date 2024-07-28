@@ -24,9 +24,6 @@ import twilio from 'twilio'
 
 const messageManager = new MessageManager()
 
-
-//CLAVE Contraseña de aplicacion (gmail): ejth ghun jxqa ntqg
-
 //Variables de Entorno
 const URI = entorno.mongoUrl
 const port = entorno.port;
@@ -56,8 +53,6 @@ app.set('views',__dirname+'/views');
 app.set("view engine", "handlebars");
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-
 //logica de la sesión
 app.use(session({
     store: new MongoStore({
@@ -82,12 +77,6 @@ app.use("/api/sessions",sessionRouter) //no se utilizará ya que es como /api/us
 app.use("/api/category", categoryRouter)
 app.use("/api/users", usersRouter)
 
-
-app.get('/api/current', (req,res) => {
-    res.send({status: "sucches", payload: req.user})
-})
-
-
 //twilio
 
 const client = twilio(process.env.TWILIO_SSID, process.env.AUTH_TOKEN)
@@ -103,7 +92,6 @@ app.post('/api/sms', async(req,res) =>{
 
     res.send("Mensaje enviado.")
 });
-
 
 //nodemailer
 
@@ -135,120 +123,6 @@ app.get('/api/mail', async(req, res) => {
     res.send("Correo enviado")
 });
 
-
-
-
-//middewlare
-//const fileStorage = FileStore(session)
-/*
-app.use(session({
-    secret:'Secreto',
-    resave:true,
-    saveUninitialized: true
-}));*/
-
-/*
-app.use(session({
-   /* store: new fileStorage({path:'./session', ttl: 100,retries: 0}),*/
-   //store: MongoStore.create({
-    //mongoUrl: URI, 
-    //ttl:15
-   //}),
-    //secret:"hola",
-    //resave: false,
-  //  saveUninitialized: false
-//}))
-
-
-
-
-//middlware autenticacon
-/*
-function auth(req,res,next) {
-    if(req.session?.user === "pepe" && req.session?.admin) {
-        return next()
-    }
-    res.status(401).send("no estás autorizado.")
-}*/
-
-/*
-//rutas session
-
-//armando una sesión:
-app.get('/session',(req,res)=>{
-    if(req.session.counter) {
-        req.session.counter++;
-        res.send("Se ha visitado el sitio "+req.session.counter)
-    } else {
-        req.session.counter=1
-        res.send("Bienvenido.")
-    }
-})
-
-//iniciar sesion
-
-app.get('/login', (req, res) => {
-    const { username, password } = req.query;
-
-    if (username !== "pepe" || password !== "pepepass") {
-        return res.send("login failed");
-    }
-
-    // Configurar la sesión antes de enviar la respuesta
-    req.session.user = username;
-    req.session.admin = true;
-
-    // Envía la respuesta de éxito después de configurar la sesión
-    res.send("login success");
-
-    // No deberías enviar ninguna respuesta después de destruir la sesión
-    req.session.destroy(err => {
-        if (err) {
-            console.log("Error al cerrar sesión:", err);
-        }
-    });
-});
-
-
-//cerrar sesion
-app.get('/logout', (req,res)=>{
-    req.session.destroy(err=>{
-        if(err){
-            res.send("Saliste de la sesión")
-        }else {
-            res.send({error: err})
-        }
-    })
-})
-
-//rutas protegidas
-
-app.get('/privado',auth,(req,res)=>{
-    res.send("Estas en el mejor lugar.")
-})
-
-*/
-
-/*
-
-COOKIES
-
-app.get('/set-signed-cookie', (req,res)=>{
-    res
-    .cookie("mi cookie","soy el king",{signed: true})
-    .send("set cookie")
-})
-
-app.get('/get-signed-cookie', (req,res)=>{
-    res.send(req.signedCookies)
-})
-app.get('/getcookie', (req,res)=>{
-    res.send(req.cookies)
-})
-app.get('/deletecookie', (req,res)=>{
-    res.clearCookie("micookie").send("Cookie removida")
-})
-*/
 
 const httpServer = app.listen(port,()=>{
     console.log("Escuchando puerto",port)

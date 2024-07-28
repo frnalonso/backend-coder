@@ -2,24 +2,24 @@ import {Router} from 'express'
 import productService from '../dao/services/product.service.js'
 import cartService from '../dao/services/cart.service.js';
 import userService from '../dao/services/user.service.js';
-import  passport  from 'passport';
+import { auth } from '../middlewares/auth.js'
 
 const router = Router();
 
 
 
-router.get('/products', passport.authenticate('jwt', {session:false}) , async (req, res) => {
+router.get('/products', auth, async (req, res) => {
     
 
     // Accede a la información de la sesión
    const userSession = req.session.user.user;
-   console.log(userSession)
    const user = await userService.getById(userSession._id) // El usuario autenticado
    //console.log(user)
    let cartId = user.cart; // Obtén el ID del carrito del usuario
-
+    console.log(cartId)
     // Si el usuario no tiene un carrito, crea uno nuevo
     if (!cartId) {
+        console.log("hola")
         const newCart = await cartService.createOne({ products: [] }); // Crea un carrito vacío
         cartId = newCart._id;
 
@@ -57,7 +57,7 @@ router.get('/products', passport.authenticate('jwt', {session:false}) , async (r
 });
 
 
-router.get('/realtimeproducts',async(req,res)=>{
+router.get('/realtimeproducts', auth, async(req,res)=>{
 
     const products = await productService.findAll(req.query)
     console.log({Products: products.docs})
@@ -65,17 +65,20 @@ router.get('/realtimeproducts',async(req,res)=>{
 })
 
 
-router.get('/chat', (req,res) => {
+router.get('/chat', auth, (req,res) => {
     res.render('chat')
 });
 
-router.get('/carts/:cid', async(req,res)=>{
+router.get('/carts/:cid',auth, async(req,res)=>{
     try {
         const {cid} = req.params
+    
     const cart = await cartService.findByIdWithProducts(cid);
-    res.render("cart", cart);
+    
+    console.log(cart._id)
+    res.render("cart", {cart});
     } catch (error) {
-        
+        console.log(error)
     }
 })
 
@@ -86,7 +89,7 @@ router.get('/login',(req,res) =>{
     res.render('login')
 })
 
-router.get('/restore', (req,res) =>{
+router.get('/restore',auth, (req,res) =>{
     res.render('restore')
 })
 

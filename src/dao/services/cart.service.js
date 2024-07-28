@@ -135,6 +135,9 @@ class CartService {
             const purchasedProducts = [];
 
             const cart = await cartRepository.findById(cid)
+            console.log("hola")
+            console.log(cart)
+            console.log("findududdu")
     
             if (!cart) {
                 throw new Error( 'Carrito no encontrado' );

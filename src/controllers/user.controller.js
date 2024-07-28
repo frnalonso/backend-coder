@@ -6,10 +6,10 @@ import authService from '../config/auth.js'
 const router = Router();
 const KeyJWT = entorno.secretJWT
 
-class UserController  {
+class UserController {
 
     // Obtener todos los usuarios
-     async getAll (req, res) {
+    async getAll(req, res) {
         try {
             const users = await userService.getAll();
             res.status(200).json({ users });
@@ -20,7 +20,7 @@ class UserController  {
     };
 
     // Obtener un usuario por su ID
-    async getById (req, res)  {
+    async getById(req, res) {
         try {
             const { id } = req.params;
             const user = await userService.getById(id);
@@ -36,7 +36,7 @@ class UserController  {
     };
 
     //Crear un nuevo usuario
-    async createUser (req, res) {
+    async createUser(req, res) {
         try {
             const newUser = req.body;
             const result = await userService.createUser(newUser);
@@ -48,7 +48,7 @@ class UserController  {
     };
 
     //Actualizar un usuario existente
-    async updateUser (req, res) {
+    async updateUser(req, res) {
         try {
             const { id } = req.params;
             const updatedUser = req.body;
@@ -65,7 +65,7 @@ class UserController  {
     };
 
     //Eliminar un usuario por su ID
-    async deleteUser (req, res) {
+    async deleteUser(req, res) {
         try {
             const { id } = req.params;
             const deletedUser = await userService.deleteUser(id);
@@ -81,50 +81,73 @@ class UserController  {
     };
 
     //login
-    async loginUser (req, res) {
+    async loginUser(req, res) {
         try {
-          const { email, password } = req.body;
-          const user = await authService.login({ email, password });
-          if (user.token) {
-            // Establece la sesión del usuario
-            req.session.token = user.token;
-            req.session.userId = user._id;
-            req.session.user = user;
-            req.session.isAuthenticated = true;
-            //req.session.userRole = user.role
-            res
-              .cookie(KeyJWT, user.token, { httpOnly: true })
-              .status(200)
-              .send({ status: "success", message: user.message });
-          } else {
-            res.status(401).send({ status: "error", message: user.message });
-          }
+            const { email, password } = req.body;
+            const user = await authService.login({ email, password });
+            if (user.token) {
+                // Establece la sesión del usuario
+                req.session.token = user.token;
+                req.session.userId = user._id;
+                req.session.user = user;
+                req.session.isAuthenticated = true;
+                //req.session.userRole = user.role
+                res
+                    .cookie(KeyJWT, user.token, { httpOnly: true })
+                    .status(200)
+                    .send({ status: "success", message: user.message });
+            } else {
+                res.status(401).send({ status: "error", message: user.message });
+            }
         } catch (error) {
-        console.log(error)
-          res.status(500).send({ status: "error", message: error.message });
+            console.log(error)
+            res.status(500).send({ status: "error", message: error.message });
         }
-      };
-
-    //Logout del usuario
-    async logoutUser(req, res)  {
-        //lógica a implementar
     };
 
+    // Manejar el logout
+    async logoutUser(req, res) {
+        req.session.destroy(err => {
+            if (err) {
+                console.error("Error al cerrar sesión:", err);
+                res.status(500).send("Error al cerrar sesión");
+            } else {
+                //res.redirect('/api/views/login'); // Redirigir al usuario al login después de cerrar sesión
+                res.status(200).send({ status: "succes", message: "Cierre de sesión con éxito." })
+            }
+        });
+    };
+
+
+
     //Restaurar password
-    async restorePassword (req, res) {
+    async restorePassword(req, res) {
         //validar (si tengo pass vacio o email le mando una rta)
-        const {email, password} = req.body
-        const user = await userService.findOne({email})//revisar metodo findOne
+        const { email, password } = req.body
+        const user = await userService.findOne({ email })//revisar metodo findOne
         console.log(user)
-    
-        if (!user){
-            res.status(400).send({status: "error", message: "No se encuentra el usuario."})
+
+        if (!user) {
+            res.status(400).send({ status: "error", message: "No se encuentra el usuario." })
         }
-    
+
         const newPass = createHash(password)
-        await userService.updateOne({_id: user._id},{ $set: { password: newPass } }) //revisar metodo updateOne
-    
-        res.status(201).send({status: "succes", message:"Password actualizado."})
+        await userService.updateOne({ _id: user._id }, { $set: { password: newPass } }) //revisar metodo updateOne
+
+        res.status(201).send({ status: "succes", message: "Password actualizado." })
+    };
+
+    async current(req, res) {
+        try {
+            const user = req.session.user.user
+            const dataUser = await userService.current(user);
+            console.log("ini")
+            console.log(dataUser)
+            console.log("fin")
+            res.send({ status: "succes", payload: req.user, dataUser })
+        } catch (error) {
+            res.status(401).send({ status: "error", message: error });
+        }
     };
 
 };

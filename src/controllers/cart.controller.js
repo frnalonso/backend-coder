@@ -20,7 +20,11 @@ class CartController {
     //Inserta productos al carrito.
     async insertProductInCart (req, res) {
         try {
-            const user = req.user._id; // Obtener el usuario autenticado
+            console.log(req.user)
+            console.log(req.session.user.user)
+            const user = req.session.user.user._id; // Obtener el usuario autenticado
+            console.log(user)
+            console.log(req.session.user.user._id)
             const { cid } = req.params; // ID del carrito desde la ruta
             const { pid } = req.params; // ID del producto desde la ruta
             console.log(user)
@@ -28,6 +32,7 @@ class CartController {
             res.status(200).json({ message: 'Producto agregado al carrito...', cart })
 
         } catch (error) {
+            console.log(error)
             res.status(400).json({ message: error })
         }
     }
@@ -118,8 +123,8 @@ class CartController {
 
     async purchaseCart (req, res) {
         const { cid } = req.params;
-        console.log(req.user)
-        const userEmail = req.user.email; // Usuario autenticado
+        console.log("el cartId: "+cid)
+        const userEmail = req.session.user.user.email; // Usuario autenticado
         try {
             const ticket = await cartService.purchaseCart(cid,userEmail)
             res.status(200).json({ message: 'Compra realizada con éxito', ticket: ticket });

@@ -1,10 +1,3 @@
-const token = localStorage.getItem('token');
-const userId = localStorage.getItem('userId');
-console.log(localStorage)
-console.log("hola")
-console.log(userId)
-console.log(token)
-
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('.add-to-cart-form');
     forms.forEach(form => {
@@ -19,12 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${document.cookie.split('=')[1]}` // Assuming the JWT is stored in a cookie
                 }
-            });
+            },
+       );
 
             if (response.ok) {
+                console.log(response)
                 window.location.href = `/api/views/carts/${cartId}`;
             } else {
                 // Manejar el error si es necesario
+                console.log(response)
                 console.error('Error al agregar el producto al carrito');
             }
         });

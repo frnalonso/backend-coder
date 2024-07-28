@@ -73,6 +73,12 @@ class UserService {
     return user;
   };
 
+  current = async(dataUser) => {
+    console.log("user.repository: "+dataUser)
+    const user = await userRepository.current(dataUser);
+    return user;
+  };
+
 };
 
 export default new UserService;

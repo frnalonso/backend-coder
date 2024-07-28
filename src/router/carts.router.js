@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import cartController from '../controllers/cart.controller.js';
-import  passport  from 'passport';
+import { auth } from '../middlewares/auth.js'
 
 const router = Router();
 
@@ -8,7 +8,7 @@ const router = Router();
 router.post('/', cartController.createCart)
 
 //Inserta productos al carrito.
-router.post('/:cid/product/:pid', passport.authenticate('jwt', { session: false }), cartController.insertProductInCart)
+router.post('/:cid/product/:pid', auth,  cartController.insertProductInCart)
 
 //Busca un único carrito según su id devolviendo también sus productos incluídos.
 router.get('/:cid', cartController.getCartByIdWithProducts)
@@ -29,5 +29,5 @@ router.put('/:cid/products/:pid', cartController.updateQuantityProductInCart)
 router.delete('/:cid', cartController.deleteAllProductsInCart)
 
 // Ruta para finalizar la compra de un carrito
-router.post('/:cid/purchase', passport.authenticate('jwt', { session: false }), cartController.purchaseCart);
+router.post('/:cid/purchase', auth, cartController.purchaseCart);
 export default router;

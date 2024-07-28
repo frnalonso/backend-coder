@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Realizada</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .ticket-info {
+            margin-bottom: 20px;
+        }
+        .back-to-products {
+            margin-top: 20px;
+        }
+        .back-to-products button {
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">¡Compra Realizada con Éxito!</h1>
+        <div class="message">Compra realizada con éxito para el carrito {{cartId}}</div>
+        <div class="ticket-info">
+            <p>Ticket ID: {{ticket._id}}</p>
+            <p>Total: ${{ticket.total}}</p>
+            <p>Fecha de Compra: {{ticket.purchaseDate}}</p>
+        </div>
+        <div class="back-to-products">
+            <button onclick="window.location.href='/api/views/products'">Volver a Productos</button>
+        </div>
+    </div>
+</body>
+</html>

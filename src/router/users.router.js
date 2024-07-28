@@ -1,11 +1,11 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
-import passport from "passport";
+import { auth } from '../middlewares/auth.js'
 
 const router = Router();
 
 // Obtener todos los usuarios
-router.get("/users",passport.authenticate('jwt', {session:false}), userController.getAll);
+router.get("/users",auth, userController.getAll);
   
   // Obtener un usuario por su ID
   router.get("/user/:id", userController.getById);
@@ -23,9 +23,13 @@ router.get("/users",passport.authenticate('jwt', {session:false}), userControlle
   router.post("/login", userController.loginUser);
 
   //Logout del usuario
-  router.post("/logout", userController.logoutUser);
+  router.post("/logout", auth, userController.logoutUser);
 
   //Restaurar password de un usuario
   router.post("/restore", userController.restorePassword);
+
+  //Devuelvo el usuario autorizado y formateado por DTO.
+  router.get('/current',auth, userController.current)
+
   
   export default router;
