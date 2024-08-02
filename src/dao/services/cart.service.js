@@ -10,7 +10,7 @@ class CartService {
         console.log("Servicio de Carrito")
     };
     async findAll() {
-        const response = await cartModel.find();
+        const response = await cartRepository.findAll();
         return response;
     };
 
@@ -135,10 +135,6 @@ class CartService {
             const purchasedProducts = [];
 
             const cart = await cartRepository.findById(cid)
-            console.log("hola")
-            console.log(cart)
-            console.log("findududdu")
-    
             if (!cart) {
                 throw new Error( 'Carrito no encontrado' );
             }
@@ -175,6 +171,8 @@ class CartService {
     
             // Vaciar el carrito
             await this.deleteAllProductsInCart(cid);
+
+            return newTicket;
 
     };
 

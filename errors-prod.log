@@ -1,0 +1,4 @@
+2024-08-02T01:01:19.989Z [fatal]: Este es un mensaje fatal
+2024-08-02T01:01:19.996Z [error]: Este es un mensaje de error
+2024-08-02T01:01:20.001Z [error]: Error al probar los logs: req.logger.warn is not a function
+2024-08-02T02:00:56.620Z [error]: Error:  k is not defined

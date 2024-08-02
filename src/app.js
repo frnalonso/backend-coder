@@ -21,6 +21,11 @@ import passport from 'passport'
 import initilizePassport from './config/passport.config.js'
 import nodemailer from 'nodemailer'
 import twilio from 'twilio'
+import { fakerES as faker } from "@faker-js/faker";
+import {addLogger} from './middlewares/logger-env.js';
+import {errorHandler} from './middlewares/errorHandler.js'
+
+
 
 const messageManager = new MessageManager()
 
@@ -28,15 +33,16 @@ const messageManager = new MessageManager()
 const URI = entorno.mongoUrl
 const port = entorno.port;
 
+
 mongoose.connect(URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
   .then(() => {
-    console.log("Conexión a la base de datos establecida");
+    logger.info("Conexión a la base de datos establecida");
   })
   .catch((error) => {
-    console.error("Error en la conexión a la base de datos:", error);
+    console.log("Error en la conexión a la base de datos:", error);
   });
 
 
@@ -45,6 +51,13 @@ const app = express();
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(express.static(__dirname+'/public'))
+
+//loggers
+app.use(addLogger)
+// Middleware de manejo de errores
+app.use(errorHandler);
+
+console.log(process.env.NODE_ENV);
 
 
 //handlebars
@@ -122,6 +135,57 @@ app.get('/api/mail', async(req, res) => {
     });
     res.send("Correo enviado")
 });
+
+
+//generar productos simulados
+const generateMockProducts = () => {
+    const products = [];
+    for (let i = 0; i < 100; i++) {
+        products.push({
+            _id: new mongoose.Types.ObjectId(),
+            title: faker.commerce.productName(),
+            brand: faker.company.name(),
+            description: faker.commerce.productDescription(),
+            price: faker.commerce.price(),
+            stock: faker.random.numeric(2),
+            category: faker.commerce.department(),
+            image: faker.image.imageUrl()
+        });
+    }
+    return products;
+};
+
+
+//mockingproducts
+app.get('/mockingproducts', (req, res) => {
+    const products = generateMockProducts();
+    res.json(products);
+})
+
+
+
+app.get('/loggers', (req, res)=>{
+    req.logger.info("Alertas")
+    res.send({message: "Esto es un logger"})
+})
+
+// Endpoint para probar los logs
+app.get("/loggerTest", (req, res) => {
+    try {
+      // Ejemplo de diferentes niveles de logs
+      req.logger.fatal("Este es un mensaje fatal");
+      req.logger.error("Este es un mensaje de error");
+      req.logger.warn("Este es un mensaje de advertencia");
+      req.logger.info("Este es un mensaje de información");
+      req.logger.debug("Este es un mensaje de depuración");
+  
+      res.status(200).send("Logs probados correctamente");
+    } catch (error) {
+      req.logger.error("Error al probar los logs:", error);
+      res.status(500).send("Error al probar los logs");
+    }
+});
+
 
 
 const httpServer = app.listen(port,()=>{
