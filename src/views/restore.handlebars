@@ -58,15 +58,16 @@
         <h2>Restaurar Contraseña</h2>
         <form id="restoreForm" method="POST">
             <div class="form-group">
-                <label for="email">Correo electrónico</label>
-                <input type="email" id="email" name="email" required>
-                <label for="email">Nueva clave</label>
+                <label for="password">Nueva Contraseña</label>
                 <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Contraseña</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
             </div>
             <button type="submit" class="btn">Restaurar Contraseña</button>
         </form>
     </div>
+    <script src="/js/restore.js"></script>
 </body>
 </html>
-
-<script src="/js/restore.js"></script>

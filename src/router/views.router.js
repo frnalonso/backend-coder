@@ -89,8 +89,12 @@ router.get('/login',(req,res) =>{
     res.render('login')
 })
 
-router.get('/restore',auth, (req,res) =>{
+router.get('/restore', (req,res) =>{
     res.render('restore')
+})
+
+router.get('/forgotpassword',  (req, res)=>{
+    res.render('forgotPassword')
 })
 
 export default router;

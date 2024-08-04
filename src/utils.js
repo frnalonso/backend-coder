@@ -2,6 +2,7 @@ import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import { entorno } from '../src/config/config.js'
 
 
 
@@ -23,8 +24,18 @@ export const createHash = (password) =>
   };
   
   // Generar un token JWT
-  export const generateToken = (email) => {
-    return jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+  export const generateToken = (userId) => {
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "5m" });
+  };
+
+  export const validateToken = (token) => {
+    try {
+      const decoded = jwt.verify(token, entorno.secretJWT);
+      return decoded;
+    } catch (error) {
+      console.log(error)
+      return null;
+    }
   };
  
 

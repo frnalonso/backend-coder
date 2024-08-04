@@ -2,6 +2,9 @@ import { createHash } from "../../utils.js"
 import userRepository from "../repositories/user.repository.js"
 import cartRepository from "../repositories/cart.repository.js";
 import authService from '../../config/auth.js'
+import nodemailer from 'nodemailer';
+import bcrypt from 'bcrypt'
+
 
 class UserService {
 
@@ -9,7 +12,7 @@ class UserService {
     console.log("Constructor UserManager");
   }
 
-  loginUser = async(email,password) => {
+  loginUser = async (email, password) => {
     const user = await authService.login({ email, password });
     return user;
   }
@@ -34,10 +37,10 @@ class UserService {
   updateUser = async (id, userData) => {
     // Hashear la contraseña antes de actualizar el usuario
     //if (userData.password) {
-      //userData.password = createHash(userData.password);
+    //userData.password = createHash(userData.password);
     //}
     console.log(userData)
-    const result = await userRepository.updateUser(id, userData, {new: true});
+    const result = await userRepository.updateUser(id, userData, { new: true });
     return result;
   };
 
@@ -68,16 +71,57 @@ class UserService {
     }
   };
 
-  findOne = async(dataUser) => {
+  findOne = async (dataUser) => {
     const user = await userRepository.findOne(dataUser)
     return user;
   };
 
-  current = async(dataUser) => {
-    console.log("user.repository: "+dataUser)
+  current = async (dataUser) => {
+    console.log("user.repository: " + dataUser)
     const user = await userRepository.current(dataUser);
     return user;
   };
+
+  sendPasswordResetEmail = async (email, token) => {
+    const url = `http://localhost:8000/api/users/reset-password/${token}`;
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.MAIL_USERNAME,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+
+   const result =  transporter.sendMail({
+      from: '"Tu Nombre" <tu_email@gmail.com>',
+      to: email,
+      subject: "Restablecer contraseña",
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${url}">Restablecer contraseña</a><p>Este enlace expira en 5 minutos.</p>`,
+    });
+
+    return result;
+  }
+
+  updatePassword = async (userId,newPassword) => {
+    const user = await userRepository.findOne(userId)
+    console.log("encontre?")
+    if(!user) {
+      throw new Error('Usuario no encontrado.')
+    }
+    console.log("user.service: "+user.password)
+    const isSamePassword = await bcrypt.compare(newPassword, user.password)
+    if(isSamePassword) {
+      throw new Error('No puede usar la misma contraseña anterior.')
+    }
+    //Hash de la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    const result = await userRepository.updateUser(userId, {password: hashedPassword});
+    return result;
+
+  }
+
+
 
 };
 

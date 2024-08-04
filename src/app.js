@@ -19,8 +19,6 @@ import MongoStore from 'connect-mongo'
 import mongoose from 'mongoose';
 import passport from 'passport'
 import initilizePassport from './config/passport.config.js'
-import nodemailer from 'nodemailer'
-import twilio from 'twilio'
 import { fakerES as faker } from "@faker-js/faker";
 import {addLogger} from './middlewares/logger-env.js';
 import {errorHandler} from './middlewares/errorHandler.js'
@@ -39,7 +37,7 @@ mongoose.connect(URI, {
   useUnifiedTopology: true,
 })
   .then(() => {
-    logger.info("Conexión a la base de datos establecida");
+    console.log("Conexión a la base de datos establecida");
   })
   .catch((error) => {
     console.log("Error en la conexión a la base de datos:", error);
@@ -56,9 +54,6 @@ app.use(express.static(__dirname+'/public'))
 app.use(addLogger)
 // Middleware de manejo de errores
 app.use(errorHandler);
-
-console.log(process.env.NODE_ENV);
-
 
 //handlebars
 app.engine('handlebars', handlebars.engine());
@@ -90,50 +85,9 @@ app.use("/api/sessions",sessionRouter) //no se utilizará ya que es como /api/us
 app.use("/api/category", categoryRouter)
 app.use("/api/users", usersRouter)
 
-//twilio
-
-const client = twilio(process.env.TWILIO_SSID, process.env.AUTH_TOKEN)
-
-//sms
-app.post('/api/sms', async(req,res) =>{
-    const message = req.body
-    const result = await client.messages.create({
-        body: message,
-        to:process.env.PHONE_NUMBER_TO, //cliente
-        from: process.env.PHONE_NUMBER  //numero de twilio
-    });
-
-    res.send("Mensaje enviado.")
-});
-
-//nodemailer
-
-const transport = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    secure: false,
-    port:587,
-    auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-    }
-});
 
 app.get('/', async (req, res) =>{
     res.send("Inicio")
-});
-
-app.get('/api/mail', async(req, res) => {
-     await transport.sendMail({
-        from: `Correo de prueba <${process.env.MAIL_USERNAME}>`,
-        to: `${process.env.MAIL_USERNAME}`,
-        subject: "Correo de prueba",
-        html: `<div>
-        <h2>CORREO</h2>
-        <p>Hola mundo</p>
-        </div>`,
-    });
-    res.send("Correo enviado")
 });
 
 

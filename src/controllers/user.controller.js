@@ -2,6 +2,7 @@ import { Router } from "express";
 import { entorno } from '../config/config.js'
 import userService from '../dao/services/user.service.js'
 import authService from '../config/auth.js'
+import { generateToken, validateToken } from "../utils.js";
 
 const router = Router();
 const KeyJWT = entorno.secretJWT
@@ -107,46 +108,74 @@ class UserController {
 
     // Manejar el logout
     async logoutUser(req, res) {
-        req.session.destroy(err => {
-            if (err) {
-                console.error("Error al cerrar sesión:", err);
-                res.status(500).send("Error al cerrar sesión");
-            } else {
-                //res.redirect('/api/views/login'); // Redirigir al usuario al login después de cerrar sesión
-                res.status(200).send({ status: "succes", message: "Cierre de sesión con éxito." })
-            }
-        });
-    };
 
-
-
-    //Restaurar password
-    async restorePassword(req, res) {
-        //validar (si tengo pass vacio o email le mando una rta)
-        const { email, password } = req.body
-        const user = await userService.findOne({ email })//revisar metodo findOne
-        console.log(user)
-
-        if (!user) {
-            res.status(400).send({ status: "error", message: "No se encuentra el usuario." })
+        try {
+            req.session.destroy(err => {
+                if (err) {
+                    console.error("Error al cerrar sesión:", err);
+                    res.status(500).send("Error al cerrar sesión");
+                } else {
+                    //res.redirect('/api/views/login'); // Redirigir al usuario al login después de cerrar sesión
+                    res.status(200).send({ status: "succes", message: "Cierre de sesión con éxito." })
+                }
+            });
+        } catch (error) {
+            res.status(500).send({ status: "error", message: error.message });
         }
 
-        const newPass = createHash(password)
-        await userService.updateOne({ _id: user._id }, { $set: { password: newPass } }) //revisar metodo updateOne
-
-        res.status(201).send({ status: "succes", message: "Password actualizado." })
     };
 
-    async current(req, res) {
+
+    
+        async current(req, res) {
+            try {
+                const user = req.session.user.user
+                const dataUser = await userService.current(user);
+                res.send({ status: "succes", payload: req.user, dataUser })
+            } catch (error) {
+                res.status(401).send({ status: "error", message: error });
+            }
+        };
+
+    //Realizo el update del password una vez ya obtenido el token.
+    async restorePassword(req, res) {
         try {
-            const user = req.session.user.user
-            const dataUser = await userService.current(user);
-            console.log("ini")
-            console.log(dataUser)
-            console.log("fin")
-            res.send({ status: "succes", payload: req.user, dataUser })
+        const { password } = req.body;
+        const {token} = req.query;
+        // Decodificar el token para obtener el ID del usuario
+        const decodedToken = validateToken(token);
+        const result = await userService.updatePassword({_id: decodedToken.userId}, password);
+        res.status(201).send({ status: "succes", message: "Password actualizado." , result})
         } catch (error) {
-            res.status(401).send({ status: "error", message: error });
+            console.log(error)
+            res.status(401).send({ status: "error", message: error.message });
+        }
+    };
+
+    //Realizo la generación de token y envío email para restablecer clave
+    async resetPassword(req, res) {
+        try {
+            const { email } = req.body
+            const user = await userService.findOne({ email })
+            const token = generateToken(user._id)
+            const sendEmail = await userService.sendPasswordResetEmail(email, token);
+            res.status(200).send({ status: "success", message: "Correo enviado.", sendEmail })
+        } catch (error) {
+            console.log(error)
+            res.status(400).send({ status: "error", message: error })
+        }
+
+    };
+
+    //Valido token y redirigo a la vista para restaurar password
+    async resetPasswordToken(req, res) {
+        try {
+            const token = req.params.token
+            const decodedToken = validateToken(token)
+            if (!decodedToken) return res.redirect("/api/views/forgotpassowrd");
+            res.redirect(`/api/views/restore?token=${token}`);
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error })
         }
     };
 

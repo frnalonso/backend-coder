@@ -25,11 +25,16 @@ router.get("/users",auth, userController.getAll);
   //Logout del usuario
   router.post("/logout", auth, userController.logoutUser);
 
+  
+  //Devuelvo el usuario autorizado y formateado por DTO.
+  router.get('/current',auth, userController.current);
+  
+  //Recuperación de la contraseña vía mailing
+  router.post('/reset-password', userController.resetPassword);
+  //Recuperación de la contraseña vía mailing con token
+  router.get('/reset-password/:token', userController.resetPasswordToken);
   //Restaurar password de un usuario
   router.post("/restore", userController.restorePassword);
-
-  //Devuelvo el usuario autorizado y formateado por DTO.
-  router.get('/current',auth, userController.current)
 
   
   export default router;
