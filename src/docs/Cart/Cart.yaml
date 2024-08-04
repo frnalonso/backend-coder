@@ -1,0 +1,262 @@
+openapi: 3.0.1
+info:
+  title: API Ecommerce
+  description: Documentación de la API Ecommerce, que facilita la gestión de compras de productos.
+  version: 1.0.0
+
+paths:
+  /api/carts:
+    post:
+      summary: Crea un nuevo carrito
+      tags:
+        - Carritos
+      requestBody:
+        description: Información del nuevo carrito
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cart'
+      responses:
+        '201':
+          description: Carrito creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+
+    get:
+      summary: Obtiene todos los carritos
+      tags:
+        - Carritos
+      responses:
+        '200':
+          description: Lista de carritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+
+  /api/carts/{cid}:
+    get:
+      summary: Obtiene un carrito por ID
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Carrito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartWithProducts'
+        '404':
+          description: Carrito no encontrado
+
+    put:
+      summary: Actualiza el carrito con un arreglo de productos
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      requestBody:
+        description: Productos a actualizar en el carrito
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductInCart'
+      responses:
+        '200':
+          description: Carrito actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartWithProducts'
+        '404':
+          description: Carrito no encontrado
+
+    delete:
+      summary: Elimina todos los productos del carrito
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Todos los productos eliminados exitosamente
+        '404':
+          description: Carrito no encontrado
+
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Inserta un producto al carrito
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto insertado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartWithProducts'
+        '404':
+          description: Carrito o producto no encontrado
+
+    delete:
+      summary: Elimina un producto del carrito
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Producto eliminado exitosamente
+        '404':
+          description: Carrito o producto no encontrado
+
+  /api/carts/{cid}/products/{pid}:
+    put:
+      summary: Actualiza la cantidad de un producto en el carrito
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      requestBody:
+        description: Cantidad actualizada del producto
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: Cantidad actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartWithProducts'
+        '404':
+          description: Carrito o producto no encontrado
+
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Finaliza la compra del carrito
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Compra finalizada exitosamente
+        '404':
+          description: Carrito no encontrado
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductInCart'
+        user:
+          type: string
+          description: ID del usuario asociado al carrito
+
+    CartWithProducts:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductInCart'
+        user:
+          type: string
+          description: ID del usuario asociado al carrito
+
+    ProductInCart:
+      type: object
+      properties:
+        product:
+          type: string
+          description: ID del producto
+        quantity:
+          type: integer
+          description: Cantidad del producto en el carrito
+      required:
+        - product
+        - quantity

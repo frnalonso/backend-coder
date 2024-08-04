@@ -22,6 +22,8 @@ import initilizePassport from './config/passport.config.js'
 import { fakerES as faker } from "@faker-js/faker";
 import {addLogger} from './middlewares/logger-env.js';
 import {errorHandler} from './middlewares/errorHandler.js'
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUiExpress from 'swagger-ui-express'
 
 
 
@@ -72,6 +74,21 @@ app.use(session({
     saveUninitialized: false 
 }))
 
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.1',
+        info: {
+            title: "API Ecommerce",
+            description: "Documentación de la API Ecommerce, en donde facilita la gestión de compras de productos."
+        }
+    },
+    apis:[`${__dirname}/docs/**/*.yaml`]
+}
+
+const specs = swaggerJSDoc(swaggerOptions)
+
+
+
 app.use(cookieParser())
 initilizePassport()
 app.use(passport.initialize())
@@ -84,6 +101,9 @@ app.use('/api/views',viewsRouter)
 app.use("/api/sessions",sessionRouter) //no se utilizará ya que es como /api/users
 app.use("/api/category", categoryRouter)
 app.use("/api/users", usersRouter)
+app.use('/api/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs, {
+    customCss: '.swagger-ui .topbar {display:none}'
+}));
 
 
 app.get('/', async (req, res) =>{
@@ -139,6 +159,7 @@ app.get("/loggerTest", (req, res) => {
       res.status(500).send("Error al probar los logs");
     }
 });
+
 
 
 
