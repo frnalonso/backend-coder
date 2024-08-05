@@ -2,13 +2,14 @@ import {Router} from 'express'
 import productService from '../dao/services/product.service.js'
 import cartService from '../dao/services/cart.service.js';
 import userService from '../dao/services/user.service.js';
-import { auth } from '../middlewares/auth.js'
+import { authenticateJWT, isUser } from '../middlewares/auth.js'
+
 
 const router = Router();
 
 
 
-router.get('/products', auth, async (req, res) => {
+router.get('/products', authenticateJWT, async (req, res) => {
     
 
     // Accede a la información de la sesión
@@ -57,7 +58,7 @@ router.get('/products', auth, async (req, res) => {
 });
 
 
-router.get('/realtimeproducts', auth, async(req,res)=>{
+router.get('/realtimeproducts', authenticateJWT, async(req,res)=>{
 
     const products = await productService.findAll(req.query)
     console.log({Products: products.docs})
@@ -65,11 +66,11 @@ router.get('/realtimeproducts', auth, async(req,res)=>{
 })
 
 
-router.get('/chat', auth, (req,res) => {
+router.get('/chat', authenticateJWT, isUser, (req,res) => {
     res.render('chat')
 });
 
-router.get('/carts/:cid',auth, async(req,res)=>{
+router.get('/carts/:cid', authenticateJWT, isUser, async(req,res)=>{
     try {
         const {cid} = req.params
     

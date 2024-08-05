@@ -73,47 +73,43 @@ class CartRepository {
     
     };
 
-    async updateCartArrayProducts (idCart, ArrayProducts) {
+    async updateCartArrayProducts(idCart, ArrayProducts) {
         try {
-
+            console.log("ArrayProducts recibido:", ArrayProducts);
+    
+            // Verifica que ArrayProducts.products sea un array
+            if (!Array.isArray(ArrayProducts.products)) {
+                throw new TypeError("El argumento ArrayProducts.products no es un array.");
+            }
+    
             const cart = await cartModel.findById(idCart).populate({
                 path: 'products.product',
                 model: 'Product'
             });
-
+    
             if (!cart) {
-                throw new Error("Carrito no encontrado.")
+                throw new Error("Carrito no encontrado.");
             }
-
-            const addProducts = ArrayProducts
-
-
-
-               for (const newProduct of addProducts) {
-                   const productIndex = cart.products.findIndex((product) => product.product._id.toString() === newProduct.product)
-                   console.log(productIndex)
-                   if (productIndex !== -1) {
-                    console.log(cart.products[productIndex].quantity)
-                    console.log(newProduct.quantity)
-                      cart.products[productIndex].quantity += newProduct.quantity
-                    } else {
-                        console.log("id:"+newProduct.product)
-                        const product = await productModel.findById(newProduct.product);
-                       cart.products.push({
-                           product: product,
-                           quantity: newProduct.quantity,
-                       })
-                   }
-               }
-                
-                await cart.save();
-                
-                return "Carrito actualizado."
-            } catch (error) {
-                console.log("Error al actualizar el carrito: ",error)
-                throw error;
-            }
-    };
+    
+            const productsToRemove = ArrayProducts.products;
+    
+            // Filtra los productos del carrito que no están en la lista de productos a remover
+            cart.products = cart.products.filter(cartProduct => 
+                !productsToRemove.some(removedProduct => 
+                    removedProduct.product.toString() === cartProduct.product._id.toString()
+                )
+            );
+    
+            await cart.save();
+    
+            return "Carrito actualizado y productos comprados eliminados.";
+        } catch (error) {
+            console.log("Error al actualizar el carrito: ", error);
+            throw error;
+        }
+    }
+    
+    
 
     async updateQuantityProductInCart(idCart, idProduct, quantity) {
         try {

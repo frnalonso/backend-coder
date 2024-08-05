@@ -10,8 +10,7 @@ import { entorno } from '../src/config/config.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename)
-//clave secreta para firmar el token JWT
-const JWT_SECRET = "KeyFrancisco"
+
 
 
 //usar trycatch
@@ -25,8 +24,8 @@ export const createHash = (password) =>
   };
   
   // Generar un token JWT
-  export const generateToken = (userId) => {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "5m" });
+  export const generateToken = (user) => {
+    return jwt.sign({ userId: user._id, role: user.role }, entorno.secretJWT, { expiresIn: "1h" });
   };
 
   export const validateToken = (token) => {

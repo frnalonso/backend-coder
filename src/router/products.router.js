@@ -1,5 +1,6 @@
 import {Router} from 'express'
 import productController from '../controllers/product.controller.js'
+import { isAdmin, authenticateJWT } from '../middlewares/auth.js'
 
 
 const router = Router();
@@ -15,13 +16,13 @@ router.get('/productscategory', productController.getAllProductsWithCategories)
 router.get('/:pid',productController.productFindById)
 
 //Creo un nuevo producto
-router.post('/', productController.createProduct)
+router.post('/',authenticateJWT,  isAdmin, productController.createProduct)
 
 //Modifico un producto
-router.put('/:pid', productController.updateProduct)
+router.put('/:pid',authenticateJWT, isAdmin, productController.updateProduct)
 
 //Elimino un producto
-router.delete('/:pid', productController.deleteProduct)
+router.delete('/:pid',authenticateJWT, isAdmin, productController.deleteProduct)
 
 
 

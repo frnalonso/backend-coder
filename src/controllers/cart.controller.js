@@ -118,6 +118,7 @@ class CartController {
             await cartService.updateCartArrayProducts(cid, products);
             res.status(200).json({ message: "Se actualizo el arreglo de productos del carrito." });
         } catch (error) {
+            console.log("asaoskaoksa")
             next(CustomError.createError({
                 name: "CartUpdateError",
                 message: errorDictionary.PRODUCT_UPDATE_FAILED.message,
@@ -167,6 +168,7 @@ class CartController {
         try {
             const ticket = await cartService.purchaseCart(cid, userEmail);
             res.status(200).json({ message: 'Compra realizada con éxito', ticket });
+            
         } catch (error) {
             next(CustomError.createError({
                 name: "PurchaseError",
