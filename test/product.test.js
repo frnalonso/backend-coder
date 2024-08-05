@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { entorno } from '../src/config/config.js'
-import Product from '../src/dao/models/product.model.js'
+
 
 
 
