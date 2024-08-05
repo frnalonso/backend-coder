@@ -13,6 +13,7 @@ const __dirname = dirname(__filename)
 //clave secreta para firmar el token JWT
 const JWT_SECRET = "KeyFrancisco"
 
+
 //usar trycatch
 //hasheo de password
 export const createHash = (password) =>

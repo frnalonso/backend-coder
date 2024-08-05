@@ -10,7 +10,6 @@ class ProductController {
     // Obtengo productos
     async getAll(req, res, next) {
         try {
-            console.log("hola")
             const products = await productService.findAll(req.query);
             console.log(products)
             if (!products || products.length === 0) {
@@ -75,8 +74,9 @@ class ProductController {
     async createProduct(req, res, next) {
         try {
             const newProduct = await productService.createOne(req.body);
-            res.status(200).json({ message: 'Producto agregado satisfactoriamente...', product: newProduct });
+            res.status(201).json({ message: 'Producto agregado satisfactoriamente...', product: newProduct });
         } catch (error) {
+            console.log(error)
             next(CustomError.createError({
                 name: "ProductCreationError",
                 message: errorDictionary.PRODUCT_CREATION_FAILED.message,
