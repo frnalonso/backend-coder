@@ -26,7 +26,7 @@ class ProductController {
             }));
         }
     }
-    
+
 
     // Obtengo productos con su categoría
     async getAllProductsWithCategories(req, res, next) {
@@ -73,7 +73,17 @@ class ProductController {
 
     async createProduct(req, res, next) {
         try {
-            const newProduct = await productService.createOne(req.body);
+
+            // Obtener los datos del producto desde req.body
+            const productData = req.body;
+
+            // Obtener el rol y el ID del usuario desde req.user
+            const userRole = req.user.role;
+            const userId = req.user.userId;
+            console.log(userRole)
+            console.log(userId)
+
+            const newProduct = await productService.createOne(productData, userRole, userId);
             res.status(201).json({ message: 'Producto agregado satisfactoriamente...', product: newProduct });
         } catch (error) {
             console.log(error)
@@ -111,8 +121,11 @@ class ProductController {
 
     async deleteProduct(req, res, next) {
         const { pid } = req.params;
+        const userRole = req.user.role; // Obtén el rol del usuario desde la solicitud
+        const userId = req.user.userId; // Obtén el ID del usuario desde la solicitud
+    
         try {
-            const response = await productService.deleteOne(pid);
+            const response = await productService.deleteOne(pid, userRole, userId);
             if (!response) {
                 throw CustomError.createError({
                     name: "ProductNotFoundError",
@@ -130,7 +143,8 @@ class ProductController {
                 description: error.message
             }));
         }
-    }
+    };
+    
 }
 
 export default new ProductController();

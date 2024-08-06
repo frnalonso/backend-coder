@@ -68,6 +68,11 @@ class ProductRepository {
           const response = await productModel.deleteOne({_id: id}).lean();
           return response;
       }
+
+      async findOne(data) {
+        const response = await productModel.findOne(data);
+        return response;
+      }
   
         //buscar con categorias incluidas
     getAllProductsWithCategories = async () => {

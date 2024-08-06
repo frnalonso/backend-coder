@@ -2,7 +2,7 @@ import {Router} from 'express'
 import productService from '../dao/services/product.service.js'
 import cartService from '../dao/services/cart.service.js';
 import userService from '../dao/services/user.service.js';
-import { authenticateJWT, isUser } from '../middlewares/auth.js'
+import { authenticateJWT, isUser, isPremium, isPremiumOrAdmin } from '../middlewares/auth.js'
 
 
 const router = Router();
@@ -58,7 +58,7 @@ router.get('/products', authenticateJWT, async (req, res) => {
 });
 
 
-router.get('/realtimeproducts', authenticateJWT, async(req,res)=>{
+router.get('/realtimeproducts', authenticateJWT, isPremiumOrAdmin,  async(req,res)=>{
 
     const products = await productService.findAll(req.query)
     console.log({Products: products.docs})
@@ -66,7 +66,7 @@ router.get('/realtimeproducts', authenticateJWT, async(req,res)=>{
 })
 
 
-router.get('/chat', authenticateJWT, isUser, (req,res) => {
+router.get('/chat', authenticateJWT, async (req,res) => {
     res.render('chat')
 });
 

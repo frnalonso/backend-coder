@@ -38,6 +38,10 @@ const productSchema = new mongoose.Schema({
         required: true,
         default:true
 
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     }
 
 })

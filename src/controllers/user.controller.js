@@ -175,9 +175,23 @@ class UserController {
             if (!decodedToken) return res.redirect("/api/views/forgotpassowrd");
             res.redirect(`/api/views/restore?token=${token}`);
         } catch (error) {
-            res.status(400).send({ status: "error", message: error })
+            res.status(400).send({ status: "error", message: error.message })
         }
     };
+
+    async changePremiumRole(req, res) {
+        try {
+            const { uid } = req.params;
+            const updatedUser = await userService.changePremiumRole(uid);
+            res.status(200).send({
+                status: "success",
+                message: "Rol de usuario actualizado correctamente.",
+                user: updatedUser
+            })
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error.message })
+        }
+    }
 
 };
 

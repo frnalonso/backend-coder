@@ -92,7 +92,7 @@ class UserService {
       },
     });
 
-   const result =  transporter.sendMail({
+    const result = transporter.sendMail({
       from: '"Tu Nombre" <tu_email@gmail.com>',
       to: email,
       subject: "Restablecer contraseña",
@@ -102,25 +102,44 @@ class UserService {
     return result;
   }
 
-  updatePassword = async (userId,newPassword) => {
+  updatePassword = async (userId, newPassword) => {
     const user = await userRepository.findOne(userId)
     console.log("encontre?")
-    if(!user) {
+    if (!user) {
       throw new Error('Usuario no encontrado.')
     }
-    console.log("user.service: "+user.password)
+    console.log("user.service: " + user.password)
     const isSamePassword = await bcrypt.compare(newPassword, user.password)
-    if(isSamePassword) {
+    if (isSamePassword) {
       throw new Error('No puede usar la misma contraseña anterior.')
     }
     //Hash de la nueva contraseña
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-    const result = await userRepository.updateUser(userId, {password: hashedPassword});
+    const result = await userRepository.updateUser(userId, { password: hashedPassword });
     return result;
 
   }
 
+  changePremiumRole = async (userId) => {
+    const user = await userRepository.findOne({_id: userId})
+    if (!user) {
+      throw new Error("Usuario no encontrado")
+    }
+
+    // Alternar entre roles "user" y "premium"
+    const newRole = user.role === 'user' ? 'premium' : 'user';
+    user.role = newRole;
+
+    const updatedUser = await userRepository.updateUser(userId, {role: newRole})
+
+    if (!updatedUser) {
+      throw new Error("Error al actualizar el rol del usuario");
+  }
+
+  return updatedUser;
+
+  };
 
 
 };
