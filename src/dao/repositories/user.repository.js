@@ -10,7 +10,7 @@ class UserRepository {
   }
 
   getAll = async () => {
-    const result = await userModel.find();
+    const result = await userModel.find({}, 'first_name last_name email role').lean();
     return result;
   };
 
@@ -78,6 +78,10 @@ class UserRepository {
   current = async(userData) => {
     const user = new UserDTO(userData)
     return user;
+  };
+
+  findInactiveUsers = async (dateLimit) => {
+    return await userModel.find({ last_connection: { $lt: dateLimit } }).lean();
   };
 };
 

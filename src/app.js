@@ -24,6 +24,7 @@ import {addLogger} from './middlewares/logger-env.js';
 import {errorHandler} from './middlewares/errorHandler.js'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUiExpress from 'swagger-ui-express'
+import Handlebars from 'handlebars'
 
 
 
@@ -62,6 +63,12 @@ app.engine('handlebars', handlebars.engine());
 app.set('views',__dirname+'/views');
 app.set("view engine", "handlebars");
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+Handlebars.registerHelper('eq', function (v1, v2, options) {
+    return v1 == v2 ? options.fn(this) : options.inverse(this);
+});
+
 
 //logica de la sesión
 app.use(session({

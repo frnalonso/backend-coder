@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Gestión de Usuarios</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each users}}
+                <tr>
+                    <td>{{this.first_name}} {{this.last_name}}</td>
+                    <td>{{this.email}}</td>
+                    <td>{{this.role}}</td>
+                    <td class="actions">
+                        <form action="/api/users/admin/usos/{{this._id}}/role" method="post">
+
+                            <select name="newRole">
+                                <option value="user" {{#eq this.role "user" }}selected{{/eq}}>Usuario</option>
+                                <option value="premium" {{#eq this.role "premium" }}selected{{/eq}}>Premium</option>
+                                <option value="admin" {{#eq this.role "admin" }}selected{{/eq}}>Administrador</option>
+                            </select>
+                            <button type="submit" class="btn">Actualizar Rol</button>
+                        </form>
+
+                        <form class="deleteForm" data-id="{{this._id}}" method="post">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+
+<script src="/js/admin.js"></script>

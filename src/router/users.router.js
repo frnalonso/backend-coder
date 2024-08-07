@@ -1,6 +1,6 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
-import { authenticateJWT, isAll, isUserOrPremium } from '../middlewares/auth.js'
+import { authenticateJWT, isAll, isUserOrPremium, isAdmin } from '../middlewares/auth.js'
 import { configureDocumentMulter, configureProfileMulter } from "../utils.js"
 
 const router = Router();
@@ -8,7 +8,7 @@ const profileUpload = configureProfileMulter();
 const documentUpload = configureDocumentMulter();
 
 // Obtener todos los usuarios
-router.get("/users", authenticateJWT, userController.getAll);
+router.get("/", authenticateJWT, userController.getAll);
 
 // Obtener un usuario por su ID
 router.get("/user/:id", userController.getById);
@@ -19,8 +19,11 @@ router.post("/user", userController.createUser);
 // Actualizar un usuario existente
 router.put("/user/:id", userController.updateUser);
 
+//Eliminar usuarios con inactividad
+router.delete("/", userController.deleteInactiveUsers);
+
 //Eliminar un usuario por su ID
-router.delete("/user/:id", userController.updateUser);
+router.delete("/user/:id", userController.deleteUser);
 
 //login
 router.post("/login", userController.loginUser);
@@ -45,6 +48,9 @@ router.put("/premium/:uid", authenticateJWT, isUserOrPremium, userController.cha
 router.post('/:uid/documents',authenticateJWT, isAll, documentUpload.array('documents', 10), userController.uploadDocuments)
 
 router.post('/:uid/profile',authenticateJWT, isAll, profileUpload.array('documents', 10), userController.uploadProfile)
+
+//Vista para el administrador
+router.get('/admin/users', authenticateJWT, isAdmin, userController.renderUserManagementPage);
 
 
 

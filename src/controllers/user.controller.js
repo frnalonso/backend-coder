@@ -15,7 +15,6 @@ class UserController {
             const users = await userService.getAll();
             res.status(200).json({ users });
         } catch (error) {
-            console.error(`Error al cargar los usuarios: ${error}`);
             res.status(500).json({ error: `Error al recibir los usuarios` });
         }
     };
@@ -76,6 +75,7 @@ class UserController {
                 res.status(404).json({ error: "Usuario no encontrado" });
             }
         } catch (error) {
+            console.log(error)
             console.error(`Error al eliminar el usuario: ${error}`);
             res.status(500).json({ error: `Error al eliminar el usuario` });
         }
@@ -201,7 +201,7 @@ class UserController {
             const uid = req.params.uid
             console.log(uid)
             const user = await userService.uploadUserDocuments(uid, req.files);
-            res.status(200).send({message: "Documentos subidos.", user})
+            res.status(200).send({ message: "Documentos subidos.", user })
         } catch (error) {
             res.status(400).send({ status: "error", message: error.message })
         }
@@ -210,11 +210,37 @@ class UserController {
         try {
             const uid = req.params.uid
             const user = await userService.uploadUserProfile(uid, req.files);
-            res.status(200).send({message: "Se ha subido la imagen de perfil.", user})
+            res.status(200).send({ message: "Se ha subido la imagen de perfil.", user })
         } catch (error) {
             res.status(400).send({ status: "error", message: error.message })
         }
     };
+
+    async deleteInactiveUsers(req, res) {
+        try {
+            const result = await userService.deleteInactiveUsers();
+            res.status(200).send({ message: "Se ha eliminado los usuarios inactivos.", result })
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error.message })
+        }
+    };
+
+    renderUserManagementPage = async (req, res) => {
+        try {
+            const users = await userService.getAll()
+            res.render('admin', { users }); // Renderiza la vista con la lista de usuarios
+        } catch (error) {
+            res.status(500).send({ status: "error", message: error.message });
+        }
+    };
+
+    changeRole = async(req, res) => {
+        try {
+            const { uid } = req.params;
+        } catch (error) {
+            res.status(500).send({ status: "error", message: error.message })
+        }
+    }
 
 };
 

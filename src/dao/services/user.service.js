@@ -18,8 +18,14 @@ class UserService {
   }
 
   getAll = async () => {
-    const result = await userRepository.getAll();
-    return result;
+    const users = await userRepository.getAll();
+    return users.map(user => ({
+      _id: user._id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      role: user.role
+    }));
   };
 
   getById = async (id) => {
@@ -93,7 +99,7 @@ class UserService {
     });
 
     const result = transporter.sendMail({
-      from: '"Tu Nombre" <tu_email@gmail.com>',
+      from: '"Ecommerce Francisco" <ecommercefrn@gmail.com>',
       to: email,
       subject: "Restablecer contraseña",
       html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${url}">Restablecer contraseña</a><p>Este enlace expira en 5 minutos.</p>`,
@@ -211,7 +217,36 @@ class UserService {
     }
   };
 
+  sendDeletionEmail = async (email) => {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.MAIL_USERNAME,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
 
+    const result = transporter.sendMail({
+      from: '"Ecommerce Francisco" <ecommercefrn@gmail.com>',
+      to: email,
+      subject: "Usuario eliminado",
+      html: `<p>Tu usuario ha sido eliminado por inactividad.</p>`,
+    });
+
+    return result;
+  }
+
+  deleteInactiveUsers = async () => {
+    const dateLimit = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // 2 días
+    const inactiveUsers = await userRepository.findInactiveUsers(dateLimit);
+    
+    for (const user of inactiveUsers) {
+      await userRepository.deleteUser(user._id);
+      await this.sendDeletionEmail(user.email);
+    }
+    
+    return `${inactiveUsers.length} usuarios eliminados por inactividad.`;
+  }
 };
 
 export default new UserService;
