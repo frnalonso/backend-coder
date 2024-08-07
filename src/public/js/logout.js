@@ -5,7 +5,7 @@ form.addEventListener('submit', e=>{
     const data = new FormData(form);
     const obj = {};
     data.forEach((value,key)=>obj[key]=value);
-    fetch('/api/sessions/logout', {
+    fetch('/api/users/logout', {
         method: "POST",
         body:JSON.stringify(obj),
         headers: {

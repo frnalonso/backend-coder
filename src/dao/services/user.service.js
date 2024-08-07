@@ -122,23 +122,93 @@ class UserService {
   }
 
   changePremiumRole = async (userId) => {
-    const user = await userRepository.findOne({_id: userId})
+    const user = await userRepository.findOne({ _id: userId })
     if (!user) {
       throw new Error("Usuario no encontrado")
+    }
+
+    // Verificar si el usuario ha subido los documentos requeridos
+    const requiredDocuments = ['Identificacion', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+
+
+    const userHasAllDocuments = requiredDocuments.every(docName =>
+      user.documents.some(doc => {
+        const docNameWithoutExtension = doc.name.split('.').slice(0, -1).join('.');
+        return docNameWithoutExtension === docName;
+      })
+    );
+
+    if (!userHasAllDocuments && user.role === 'user') {
+      throw new Error("Faltan documentos requeridos para cambiar el rol a premium. El usuario no ha terminado de procesar su documentación.");
     }
 
     // Alternar entre roles "user" y "premium"
     const newRole = user.role === 'user' ? 'premium' : 'user';
     user.role = newRole;
 
-    const updatedUser = await userRepository.updateUser(userId, {role: newRole})
+    const updatedUser = await userRepository.updateUser(userId, { role: newRole })
 
     if (!updatedUser) {
       throw new Error("Error al actualizar el rol del usuario");
-  }
+    }
 
-  return updatedUser;
+    return updatedUser;
 
+  };
+
+  updateLastConnection = async (userId) => {
+    const lastConnectionDate = new Date();
+    await userRepository.updateUser(userId, { last_connection: lastConnectionDate });
+  };
+
+  uploadUserDocuments = async (userId, files) => {
+    try {
+      // Encuentra el usuario por ID
+      const user = await userRepository.findOne({ _id: userId })
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Crear el array de documentos con las propiedades name y reference
+      const newDocuments = files.map(file => ({
+        name: file.originalname,
+        reference: file.path // Ruta o referencia del archivo
+      }));
+
+      // Agregar los nuevos documentos al array existente
+      user.documents = [...user.documents, ...newDocuments];
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw new Error(`Error al subir documento/s: ${error.message}`);
+    }
+  };
+
+  uploadUserProfile = async (userId, files) => {
+    try {
+      // Encuentra el usuario por ID
+      const user = await userRepository.findOne({ _id: userId })
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Crear el array de documentos con las propiedades name y reference
+      const newDocuments = files.map(file => ({
+        name: file.originalname,
+        reference: file.path // Ruta o referencia del archivo
+      }));
+
+      // Agregar los nuevos documentos al array existente
+      user.documents = [...user.documents, ...newDocuments];
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw new Error(`Error al subir foto de perfil: ${error.message}`);
+    }
   };
 
 

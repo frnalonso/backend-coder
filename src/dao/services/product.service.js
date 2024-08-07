@@ -1,4 +1,5 @@
 import productRepository from '../repositories/product.repository.js'
+import userRepository from '../repositories/user.repository.js';
 
 class ProductService {
 
@@ -48,7 +49,7 @@ class ProductService {
         if (!existingProduct) {
             throw new Error('Producto no encontrado');
         }
-    
+
         // Verifica permisos de eliminación
         if (userRole === 'admin') {
             // Los administradores pueden eliminar cualquier producto
@@ -63,8 +64,34 @@ class ProductService {
         } else {
             throw new Error('Acceso denegado: No tienes permisos para eliminar productos.');
         }
-    }
-    
+    };
+
+    uploadUserProduct = async (userId, files) => {
+        try {
+            // Encuentra el usuario por ID
+            const user = await userRepository.findOne({ _id: userId })
+
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Crear el array de documentos con las propiedades name y reference
+            const newDocuments = files.map(file => ({
+                name: file.originalname,
+                reference: file.path // Ruta o referencia del archivo
+            }));
+
+            // Agregar los nuevos documentos al array existente
+            user.documents = [...user.documents, ...newDocuments];
+            await user.save();
+
+            return user;
+        } catch (error) {
+            throw new Error(`Error al subir foto del producto: ${error.message}`);
+        }
+    };
+
+
 
     //buscar con categorias incluidas
     getAllProductsWithCategories = async () => {

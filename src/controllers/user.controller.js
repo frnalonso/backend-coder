@@ -108,8 +108,11 @@ class UserController {
 
     // Manejar el logout
     async logoutUser(req, res) {
-
         try {
+            // Obtén el ID del usuario desde la sesión o token
+            const userId = req.user.userId// O donde sea que almacenes el userId
+            // Actualiza last_connection en la base de datos
+            await userService.updateLastConnection(userId);
             req.session.destroy(err => {
                 if (err) {
                     console.error("Error al cerrar sesión:", err);
@@ -126,26 +129,26 @@ class UserController {
     };
 
 
-    
-        async current(req, res) {
-            try {
-                const user = req.session.user.user
-                const dataUser = await userService.current(user);
-                res.send({ status: "succes", payload: req.user, dataUser })
-            } catch (error) {
-                res.status(401).send({ status: "error", message: error });
-            }
-        };
+
+    async current(req, res) {
+        try {
+            const user = req.session.user.user
+            const dataUser = await userService.current(user);
+            res.send({ status: "succes", payload: req.user, dataUser })
+        } catch (error) {
+            res.status(401).send({ status: "error", message: error });
+        }
+    };
 
     //Realizo el update del password una vez ya obtenido el token.
     async restorePassword(req, res) {
         try {
-        const { password } = req.body;
-        const {token} = req.query;
-        // Decodificar el token para obtener el ID del usuario
-        const decodedToken = validateToken(token);
-        const result = await userService.updatePassword({_id: decodedToken.userId}, password);
-        res.status(201).send({ status: "succes", message: "Password actualizado." , result})
+            const { password } = req.body;
+            const { token } = req.query;
+            // Decodificar el token para obtener el ID del usuario
+            const decodedToken = validateToken(token);
+            const result = await userService.updatePassword({ _id: decodedToken.userId }, password);
+            res.status(201).send({ status: "succes", message: "Password actualizado.", result })
         } catch (error) {
             console.log(error)
             res.status(401).send({ status: "error", message: error.message });
@@ -191,7 +194,27 @@ class UserController {
         } catch (error) {
             res.status(400).send({ status: "error", message: error.message })
         }
-    }
+    };
+
+    async uploadDocuments(req, res) {
+        try {
+            const uid = req.params.uid
+            console.log(uid)
+            const user = await userService.uploadUserDocuments(uid, req.files);
+            res.status(200).send({message: "Documentos subidos.", user})
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error.message })
+        }
+    };
+    async uploadProfile(req, res) {
+        try {
+            const uid = req.params.uid
+            const user = await userService.uploadUserProfile(uid, req.files);
+            res.status(200).send({message: "Se ha subido la imagen de perfil.", user})
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error.message })
+        }
+    };
 
 };
 

@@ -144,6 +144,17 @@ class ProductController {
             }));
         }
     };
+
+    async uploadProduct(req, res) {
+        try {
+            const uid = req.params.uid;
+            console.log(uid)
+            const user = await productService.uploadUserProduct(uid, req.files);
+            res.status(200).send({message: "Se ha subido la imagen del producto.", user})
+        } catch (error) {
+            res.status(400).send({ status: "error", message: error.message })
+        }
+    };
     
 }
 

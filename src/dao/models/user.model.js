@@ -6,11 +6,11 @@ const userSchema = new mongoose.Schema({
     email: String,
     age: Number,
     password: String,
-    
+
     cart:
-           {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Cart"
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Cart"
     },
 
     role: {
@@ -18,6 +18,21 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "admin", "premium"],
         default: "user"
     },
+
+    documents: [{
+        name: {
+            type: String,
+            required: true,
+        },
+        reference: {
+            type: String,
+            required: true,
+        }
+    }],
+    
+    last_connection: {
+        type: Date,
+      },
 
 });
 

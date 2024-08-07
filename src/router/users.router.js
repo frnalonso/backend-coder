@@ -1,8 +1,11 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
-import { authenticateJWT, isUser, isUserOrPremium } from '../middlewares/auth.js'
+import { authenticateJWT, isAll, isUserOrPremium } from '../middlewares/auth.js'
+import { configureDocumentMulter, configureProfileMulter } from "../utils.js"
 
 const router = Router();
+const profileUpload = configureProfileMulter();
+const documentUpload = configureDocumentMulter();
 
 // Obtener todos los usuarios
 router.get("/users", authenticateJWT, userController.getAll);
@@ -36,8 +39,13 @@ router.get('/reset-password/:token', userController.resetPasswordToken);
 //Restaurar password de un usuario
 router.post("/restore", userController.restorePassword);
 
-//Maneja la solicitud para cambiar el rol del usuario a premium
+//Cambiar el rol del usuario a premium
 router.put("/premium/:uid", authenticateJWT, isUserOrPremium, userController.changePremiumRole);
+
+router.post('/:uid/documents',authenticateJWT, isAll, documentUpload.array('documents', 10), userController.uploadDocuments)
+
+router.post('/:uid/profile',authenticateJWT, isAll, profileUpload.array('documents', 10), userController.uploadProfile)
+
 
 
 export default router;

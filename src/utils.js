@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url'
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { entorno } from '../src/config/config.js'
+import multer from 'multer';
+import path from 'path'
 
 
 
@@ -38,6 +40,44 @@ export const createHash = (password) =>
     }
   };
  
+  export function configureProductMulter() {
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, path.join(__dirname, 'public', 'products'));
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        },
+    });    
+
+    return multer({ storage: storage });
+}
+
+export function configureProfileMulter() {
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, path.join(__dirname, 'public', 'profiles'));
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        },
+    });    
+
+    return multer({ storage: storage });
+}
+
+export function configureDocumentMulter() {
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, path.join(__dirname, 'public', 'documents'));
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        },
+    });    
+
+    return multer({ storage: storage });
+}
 
 /*
 export const authToken = ( req, res, next ) => {

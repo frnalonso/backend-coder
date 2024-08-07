@@ -17,6 +17,11 @@ import { isValidPassword, generateToken } from "../utils.js";
       if (!valid) return "Error de auteuticación";
       const token = generateToken(user);
       console.log("El token es:"+token)
+      user.last_connection = new Date();
+      await user.save();
+      console.log("mi ultima conexcion")
+      console.log(user.last_connection)
+      console.log("ultima")
       return {status: "succes", message: "Autenticacion exitosa", token, user};
     } catch (error) {
       console.log(error)

@@ -1,9 +1,11 @@
 import {Router} from 'express'
 import productController from '../controllers/product.controller.js'
-import { isAdmin, authenticateJWT, isPremiumOrAdmin } from '../middlewares/auth.js'
+import { isAll, authenticateJWT, isPremiumOrAdmin } from '../middlewares/auth.js'
+import { configureProductMulter } from "../utils.js"
 
 
 const router = Router();
+const productUpload = configureProductMulter();
 //const productManager = new ProductManager("../Products.json")
 
 //Obtengo productos
@@ -23,6 +25,8 @@ router.put('/:pid',authenticateJWT, isPremiumOrAdmin, productController.updatePr
 
 //Elimino un producto
 router.delete('/:pid',authenticateJWT, isPremiumOrAdmin, productController.deleteProduct)
+
+router.post('/:uid/products',authenticateJWT, isAll, productUpload.array('documents', 10), productController.uploadProduct)
 
 
 
