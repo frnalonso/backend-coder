@@ -83,6 +83,13 @@ class UserRepository {
   findInactiveUsers = async (dateLimit) => {
     return await userModel.find({ last_connection: { $lt: dateLimit } }).lean();
   };
+
+  updateUserRole = async (uid, newRole) => {
+    const result = await userModel.updateOne({ _id: uid }, { $set: { role: newRole } });
+    return result;
+  }
+
+
 };
 
 export default new UserRepository;

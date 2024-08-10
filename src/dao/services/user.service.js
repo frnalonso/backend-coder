@@ -234,19 +234,31 @@ class UserService {
     });
 
     return result;
-  }
+  };
 
   deleteInactiveUsers = async () => {
     const dateLimit = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // 2 días
     const inactiveUsers = await userRepository.findInactiveUsers(dateLimit);
-    
+
     for (const user of inactiveUsers) {
       await userRepository.deleteUser(user._id);
       await this.sendDeletionEmail(user.email);
     }
-    
+
     return `${inactiveUsers.length} usuarios eliminados por inactividad.`;
+  };
+
+  updateUserRole = async (uid, newRole) => {
+    const user = userRepository.findOne({ _id: uid })
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    const userUpdateRole = await userRepository.updateUserRole(uid, newRole)
+    console.log(userUpdateRole)
+    return userUpdateRole;
+
   }
+
 };
 
 export default new UserService;

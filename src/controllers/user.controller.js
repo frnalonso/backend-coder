@@ -225,7 +225,7 @@ class UserController {
         }
     };
 
-    renderUserManagementPage = async (req, res) => {
+    async renderUserManagementPage(req, res) {
         try {
             const users = await userService.getAll()
             res.render('admin', { users }); // Renderiza la vista con la lista de usuarios
@@ -234,13 +234,20 @@ class UserController {
         }
     };
 
-    changeRole = async(req, res) => {
+    async changeRole(req, res) {
         try {
             const { uid } = req.params;
+            const { newRole } = req.body; //Extrae el nuevo rol del cuerpo de la solicitud
+            const updatedUser = await userService.updateUserRole(uid, newRole);
+            res.status(200).send({
+                status: "success",
+                message: "Rol de usuario actualizado correctamente.",
+                user: updatedUser
+            })
         } catch (error) {
-            res.status(500).send({ status: "error", message: error.message })
+            res.status(400).send({ status: "error", message: error.message })
         }
-    }
+    };
 
 };
 

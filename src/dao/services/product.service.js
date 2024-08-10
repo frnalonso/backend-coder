@@ -1,5 +1,6 @@
 import productRepository from '../repositories/product.repository.js'
 import userRepository from '../repositories/user.repository.js';
+import nodemailer from 'nodemailer';
 
 class ProductService {
 
@@ -45,18 +46,21 @@ class ProductService {
     }
 
     async deleteOne(id, userRole, userId) {
-        const existingProduct = await productRepository.findById(id);
-        if (!existingProduct) {
+        const product = await productRepository.findById(id);
+        const owner = await userRepository.findOne({_id: product.owner})
+
+        if (!product) {
             throw new Error('Producto no encontrado');
         }
-
-        // Verifica permisos de eliminación
-        if (userRole === 'admin') {
+        //Verifica permisos de eliminación
+        if (userRole === 'admin' && owner.role == 'premium') {
+            console.log("entra la primer if")
             // Los administradores pueden eliminar cualquier producto
+            const sendEmail = await this.sendProductDeletionEmail(owner.email)
             return await productRepository.deleteOne(id);
         } else if (userRole === 'premium') {
             // Los usuarios premium solo pueden eliminar productos que les pertenecen
-            if (existingProduct.owner.toString() === userId.toString()) {
+            if (product.owner.toString() === userId.toString()) {
                 return await productRepository.deleteOne(id);
             } else {
                 throw new Error('No tienes permiso para eliminar este producto.');
@@ -64,7 +68,31 @@ class ProductService {
         } else {
             throw new Error('Acceso denegado: No tienes permisos para eliminar productos.');
         }
+       
+
     };
+
+    sendProductDeletionEmail = async (userEmail) => {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.MAIL_USERNAME,
+            pass: process.env.MAIL_PASSWORD,
+          },
+        });
+    
+        const result = transporter.sendMail({
+          from: '"Ecommerce Francisco" <alofrandi@gmail.com>',
+          to: userEmail,
+          subject: "Producto Eliminado",
+          html: `<p>Tu producto ha sido eliminado del catálogo. Si tienes alguna pregunta, por favor contáctanos.</p>`,
+        });
+
+        console.log("Email")
+        console.log(result)
+        console.log("Email")
+        return result;
+      }
 
     uploadUserProduct = async (userId, files) => {
         try {

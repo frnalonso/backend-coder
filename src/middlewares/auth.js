@@ -62,16 +62,17 @@ export const isUserOrPremium = (req, res, next) => {
         next();
     }
     else {
-        return res.status(403).json({ error: 'Acceso no autorizado' });
+        return res.status(403).json({ error: 'Acceso no autorizado. Tiene que ser user o premium' });
     }
 }
 
 export const isPremiumOrAdmin = (req, res, next) => {
+    console.log(req.user)
     if(req.user && req.user.role === 'premium' || req.user.role === 'admin') {
         next();
     }
     else {
-        return res.status(403).json({ error: 'Acceso no autorizado' });
+        return res.status(403).json({ error: 'Acceso no autorizado. Tiene que ser premium o admin' });
     }
 }
 
