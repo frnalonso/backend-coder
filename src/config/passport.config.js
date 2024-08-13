@@ -111,7 +111,7 @@ const initilizePassport = () => {
     
     );
     
-    
+    */
     
     // Serializar y deserializar usuario para guardar en sesión
     passport.serializeUser((user, done) => {
@@ -128,7 +128,7 @@ const initilizePassport = () => {
     });
     
     
-    */
+    
 
     //github
     passport.use(
@@ -137,11 +137,11 @@ const initilizePassport = () => {
             {
                 clientID: "Iv23liF6HQ7dnkOGxYBN", //id de la app en github
                 clientSecret: "9822d8460379e0c0344733e4f3df7fabed043764",  //clave secreta de github
-                callbackURL: "http://localhost:8000/api/sessions/githubcallback" //url callback
+                callbackURL: "http://localhost:8000/api/users/githubcallback" //url callback
             },
             async (accesToken, refreshToken, profile, done) => {
                 try {
-                    console.log(profile)
+                    console.log(profile._json.email)
                     const user = await userModel.findOne({
                         email: profile._json.email,
                     });
@@ -168,6 +168,7 @@ const initilizePassport = () => {
         )
 
     );
+    
 
 
 };

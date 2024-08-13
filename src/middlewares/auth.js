@@ -10,17 +10,18 @@ export function auth(req,res,next) {
 export const authenticateJWT = (req, res, next) => {
     const token = req.cookies.KeyFrancisco || req.headers.authorization?.split(' ')[1]; 
     console.log(token)
-    console.log(req.cookies.KeyFrancisco)
+    console.log("finDelTokokok")
     if (!token) {
         return res.status(401).json({ message: 'Acceso denegado: No se proporcionó un token.' });
     }
 
     const decoded = validateToken(token);
+    console.log(decoded)
     console.log(decoded.userId)
     console.log(decoded.role)
 
     if (decoded) {
-        req.user = { userId: decoded.userId, role: decoded.role }; //Decodifica el token y añade el userId a req.user
+        req.user = { userId: decoded.id, role: decoded.role }; //Decodifica el token y añade el userId a req.user
         next();
     } else {
         return res.status(403).json({ message: 'Token inválido o expirado.' });

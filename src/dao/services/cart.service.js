@@ -1,7 +1,8 @@
 import cartRepository from '../repositories/cart.repository.js';
-import productModel from '../models/product.model.js'; //arreglar y corregir no usar model aca
 import productRepository from '../repositories/product.repository.js';
 import ticketRepository from '../repositories/ticket.repository.js';
+import TicketDTO from '../DTOs/ticket.dto.js';
+
 
 
 class CartService {
@@ -130,7 +131,7 @@ class CartService {
         }
     }
 
-    async purchaseCart(cid, userEmail) {
+    async purchaseCart(cid, userId) {
         let totalAmount = 0;
         const purchasedProducts = [];
         const failedProducts = []; // Para los productos que no pudieron comprarse
@@ -165,7 +166,7 @@ class CartService {
         const ticketData = {
             code: `TICKET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             amount: totalAmount,
-            purchaser: userEmail
+            purchaser: userId
         };
 
         const newTicket = await ticketRepository.createOne(ticketData);
@@ -177,13 +178,11 @@ class CartService {
 
         // Dejar en el carrito los productos que no se pudieron comprar
         if (failedProducts.length > 0) {
-            console.log("holaaa")
-            console.log(failedProducts.length)
             await this.updateCartArrayProducts(cid, failedProducts);
         }
 
         return {
-            ticket: newTicket,
+            ticket: new TicketDTO(newTicket),
             failedProducts: failedProducts.map(item => item.product._id)
         };
     }

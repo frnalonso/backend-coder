@@ -84,7 +84,7 @@ class CartController {
             console.log(carts)
             res.status(200).json({ message: "Carritos encontrados: ", cart: carts });
         } catch (error) {
-            req.logger.error("Error: ",error)
+            req.logger.error("Error: ", error)
             next(CustomError.createError({
                 name: "CartRetrievalError",
                 message: errorDictionary.CART_NOT_FOUND.message,
@@ -164,12 +164,21 @@ class CartController {
     // Realiza la compra del carrito
     async purchaseCart(req, res, next) {
         const { cid } = req.params;
-        const userEmail = req.session.user.user.email;
+        console.log(req.session.user)
+        const userId = req.session.user.user._id;
         try {
-            const ticket = await cartService.purchaseCart(cid, userEmail);
-            res.status(200).json({ message: 'Compra realizada con éxito', ticket });
-            
+            const ticket = await cartService.purchaseCart(cid, userId);
+            // Convierto mi DTO que viene del servicio para mostrar el ticket en el alert al realizar la compra.
+            const ticketDTO = {
+                code: ticket.ticket.code,
+                amount: ticket.ticket.amount,
+                purchaser: ticket.ticket.purchaser.toString()
+            };
+            res.status(200).json({ message: 'Compra realizada con éxito', ticket: ticketDTO});
+           
+
         } catch (error) {
+            console.log(error.message)
             next(CustomError.createError({
                 name: "PurchaseError",
                 message: errorDictionary.PURCHASE_FAILED.message,

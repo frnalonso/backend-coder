@@ -2,6 +2,9 @@ import { Router } from "express";
 import userController from "../controllers/user.controller.js";
 import { authenticateJWT, isAll, isUserOrPremium, isAdmin } from '../middlewares/auth.js'
 import { configureDocumentMulter, configureProfileMulter } from "../utils.js"
+import { entorno } from '../config/config.js'
+import passport from 'passport';
+const KeyJWT = entorno.secretJWT
 
 const router = Router();
 const profileUpload = configureProfileMulter();
@@ -56,5 +59,16 @@ router.post('/:uid/profile',authenticateJWT, isAll, profileUpload.array('documen
 router.get('/admin/users', authenticateJWT, isAdmin, userController.renderUserManagementPage);
 
 
+    //Iniciar sesión usando GitHub
+    router.get('/github', passport.authenticate('github',{scope: ["user:email"] }), 
+    async (req, res) =>{
+            //podemos enviar una respuesta
+            console.log("Exitoso desde get /github")
+        }
+    )
+    
+    //ruta que nos lleva a github login
+    router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), userController.gitHubCallBack);
+    
 
 export default router;

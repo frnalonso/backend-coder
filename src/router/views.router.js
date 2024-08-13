@@ -14,13 +14,12 @@ router.get('/products', authenticateJWT, async (req, res) => {
 
     // Accede a la información de la sesión
    const userSession = req.session.user.user;
-   const user = await userService.getById(userSession._id) // El usuario autenticado
-   //console.log(user)
+   const user = await userService.getById(userSession) // El usuario autenticado
+   console.log(user)
    let cartId = user.cart; // Obtén el ID del carrito del usuario
     console.log(cartId)
     // Si el usuario no tiene un carrito, crea uno nuevo
     if (!cartId) {
-        console.log("hola")
         const newCart = await cartService.createOne({ products: [] }); // Crea un carrito vacío
         cartId = newCart._id;
 

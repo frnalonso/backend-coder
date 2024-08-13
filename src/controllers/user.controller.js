@@ -93,6 +93,7 @@ class UserController {
                 req.session.user = user;
                 req.session.isAuthenticated = true;
                 //req.session.userRole = user.role
+
                 res
                     .cookie(KeyJWT, user.token, { httpOnly: true })
                     .status(200)
@@ -105,6 +106,33 @@ class UserController {
             res.status(500).send({ status: "error", message: error.message });
         }
     };
+
+    async gitHubCallBack(req, res)  {
+        try {
+            const user = await authService.gitHubCallBack(req);
+            console.log("esteessssss")
+            console.log(user)
+            console.log("fininfisaaaaaaaaaaaaaaaaaaa")
+            // Establece la sesión del usuario
+            req.session.token = user.token;
+            req.session.userId = user._id;
+            req.session.user = user;
+            req.session.isAuthenticated = true;
+            req.session.userRole = user.role;
+
+            console.log(req.session.user)
+            console.log("finfifnif")
+
+            res.cookie(KeyJWT, user.token, {
+                httpOnly: true,
+            });
+            res.redirect('/api/views/products');
+        } catch (error) {
+            console.error('Error en el callback de GitHub:', error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
+
 
     // Manejar el logout
     async logoutUser(req, res) {
@@ -248,6 +276,8 @@ class UserController {
             res.status(400).send({ status: "error", message: error.message })
         }
     };
+
+
 
 };
 

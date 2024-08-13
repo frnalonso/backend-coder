@@ -27,7 +27,31 @@ import { isValidPassword, generateToken } from "../utils.js";
       console.log(error)
       res.status(500).send({ status: "error", massage: error.message });
     }
+  };
+
+  async gitHubCallBack(req) {
+    const user = req.user;
+    console.log(user)
+    try {
+        console.log(`user: ${user}`);
+        const token = generateToken(user);
+        console.log("GITHUBBB:El token es:"+token)
+        user.last_connection = new Date();
+        await user.save();
+        console.log("mi ultima conexcion")
+        console.log(user.last_connection)
+        console.log("ultima")
+        return {status: "succes", message: "Autenticacion exitosa", token, user};
+    } catch (error) {
+        console.log(`Error en GitHub callback del user: ${user} - ${error.message}`);
+        throw new Error("Error interno del servidor");
+    }
   }
+
+
 };
+
+
+
 
 export default new AuthManager;

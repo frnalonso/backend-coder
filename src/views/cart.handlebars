@@ -55,14 +55,6 @@
             <div class="subtotal">
                 <p>Subtotal: ${{this.subtotal}}</p>    
             </div>
-            <div class="button-group">
-                <form action="/api/carts/{{../cart._id}}/products/{{this.product._id}}/increment" method="POST">
-                    <button type="submit" class="quantity-button">+</button>
-                </form>
-                <form action="/api/carts/{{../cart._id}}/products/{{this.product._id}}/decrement" method="POST">
-                    <button type="submit" class="quantity-button">-</button>
-                </form>
-            </div>
         </div>
         {{/each}}
         <br><br>

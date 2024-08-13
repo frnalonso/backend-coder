@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             const cartId = form.dataset.cartId;
-            console.log(form.dataset)
-            console.log(cartId)
             const response = await fetch(`/api/carts/${cartId}/purchase`, {
                 method: 'POST',
                 headers: {
@@ -14,8 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            const result = await response.json();
+
             if (response.ok) {
-                console.log("Compra concretada.");
+                // Mostrar el ticket en una alerta
+                alert(`Compra realizada con éxito. Ticket: ${JSON.stringify(result.ticket)}`);
+
+                // Redirigir al usuario
                 window.location.href = `/api/views/carts/${cartId}`;
             } else {
                 // Manejar el error si es necesario
