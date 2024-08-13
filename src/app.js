@@ -114,7 +114,7 @@ app.use('/api/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs, {
 
 
 app.get('/', async (req, res) =>{
-    res.send('/api/views/login')
+    res.redirect('/api/views/login')
 });
 
 
